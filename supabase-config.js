@@ -9,7 +9,12 @@
 const SUPABASE_URL = "https://bycvzrslgkkyiuxtdctz.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_T9TdW5g7AqBiOUPo3-MxrQ_loDP9_tc";
 
-const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+let supabaseClient;
+try {
+  supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+} catch (e) {
+  console.error('Failed to create Supabase client:', e);
+}
 
 const CONTENT_ROW_ID = "ana-site"; // the id of the row in site_content holding this site's data
 
