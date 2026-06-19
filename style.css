@@ -1,113 +1,296 @@
-/* ============================================================
-   ANA'S WEBSITE CONTENT
-   ============================================================
-   This is the ONLY file you should need to edit.
-   Everything in quotes " " is what shows up on the website —
-   change the text between the quotes, save the file, and
-   refresh the page (or re-upload if hosted online) to see it.
+:root {
+  --ink: #15191B;
+  --ink-soft: #4A5256;
+  --muted: #8A9296;
+  --bg: #FCFCFB;
+  --bg-raised: #FFFFFF;
+  --line: #E7E5E1;
+  --accent: #3E6E78;
+  --accent-soft: #EAF1F2;
+  --radius: 10px;
+}
 
-   Don't delete commas, colons, or curly braces { } — just edit
-   the text inside the quotes. If something breaks, undo your
-   last change and try again.
-   ============================================================ */
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
 
-const SITE_CONTENT = {
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
 
-  // ---------- BASIC INFO ----------
-  name: "Ana Chandlee",
-  tagline: "Doctor of Physical Therapy Candidate, UIC",
-  location: "Chicago, Illinois",
+a { color: inherit; }
+img { max-width: 100%; display: block; }
 
-  // ---------- CONTACT ----------
-  // Update these any time your contact info changes.
-  email: "ana.chandlee@example.com",
-  phone: "(555) 123-4567",
-  linkedin: "https://www.linkedin.com/in/ana-chandlee", // replace with your real LinkedIn URL
+.wrap {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 0 32px;
+}
 
-  // ---------- RESUME PDF ----------
-  // Optional: add a PDF of your résumé to assets/certifications (or a new
-  // assets/resume folder) and put its file name here. The "Résumé" button
-  // will link to it. Leave as-is if you don't want a résumé button yet.
-  resume: "assets/resume/ana-chandlee-resume.pdf",
+.mono {
+  font-family: "JetBrains Mono", ui-monospace, Menlo, monospace;
+}
 
-  // ---------- PHOTO ----------
-  // Put your photo file inside the assets/photos folder, then
-  // type its file name here (must match exactly, including .jpg or .png)
-  photo: "assets/photos/ana-headshot.jpg", // already added for you
+/* ---------- Nav ---------- */
+nav {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(252, 252, 251, 0.85);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--line);
+}
+nav .wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 68px;
+}
+.nav-name {
+  font-weight: 600;
+  font-size: 15px;
+  text-decoration: none;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
+nav .links {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+}
+nav .links a {
+  font-size: 13.5px;
+  font-weight: 500;
+  text-decoration: none;
+  color: var(--ink-soft);
+  letter-spacing: 0.01em;
+  transition: color 0.15s ease;
+}
+nav .links a:hover { color: var(--ink); }
+nav .links .resume-link {
+  padding: 8px 16px;
+  border: 1px solid var(--ink);
+  border-radius: 100px;
+  color: var(--ink);
+}
+nav .links .resume-link:hover { background: var(--ink); color: var(--bg); }
 
-  // ---------- ABOUT ----------
-  // This is your intro paragraph. Write it like you're
-  // introducing yourself to someone in person.
-  about: "I'm a Doctor of Physical Therapy candidate at the University of Illinois Chicago, graduating from Loras College with a Kinesiology major and Spanish and Coaching minors. I previously worked as a Physical Therapy Aide at Dubuque Physical Therapy, and I'm passionate about helping people move and feel better. Outside of school, I love staying active through sports, spending time on the river, and traveling whenever I get the chance.",
+/* ---------- Hero ---------- */
+.hero { padding: 90px 0 64px; }
+.eyebrow {
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  margin-bottom: 28px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.eyebrow .idx { color: var(--accent); font-weight: 600; }
+.eyebrow .dot { width: 4px; height: 4px; border-radius: 50%; background: var(--muted); }
 
-  // ---------- EDUCATION ----------
-  // Add or remove entries by copying/pasting a whole { ... } block.
-  // Most recent first.
-  education: [
-    {
-      school: "University of Illinois Chicago (UIC)",
-      degree: "Doctor of Physical Therapy (DPT)",
-      years: "Fall 2026 – Present",
-      details: "Starting Fall 2026."
-    },
-    {
-      school: "Loras College",
-      degree: "Bachelor's Degree — Kinesiology major; Spanish & Coaching minors",
-      years: "Aug 2022 – May 2025",
-      details: "Activities and societies: Women's Basketball, CaresLab, Duthon."
-    },
-    {
-      school: "University of Northern Iowa",
-      degree: "Coursework",
-      years: "Aug 2021 – May 2022",
-      details: ""
-    }
-  ],
+h1.display {
+  font-size: clamp(44px, 7vw, 76px);
+  line-height: 1.0;
+  margin: 0 0 8px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+.display .accent-word { color: var(--accent); }
 
-  // ---------- EXPERIENCE ----------
-  // Add jobs, internships, clinical hours, volunteer work, etc.
-  // Add or remove entries the same way as Education above.
-  experience: [
-    {
-      title: "Physical Therapy Aide",
-      organization: "Dubuque Physical Therapy — Dubuque, Iowa",
-      years: "", // add dates if you'd like them shown
-      details: "Assisted physical therapists with patient care, exercises, and clinic operations."
-    }
-  ],
+.hero-role {
+  font-size: clamp(20px, 2.6vw, 26px);
+  font-weight: 500;
+  color: var(--ink-soft);
+  margin: 0 0 22px;
+  letter-spacing: -0.01em;
+}
 
-  // ---------- CERTIFICATIONS ----------
-  // Put each certification PDF inside assets/certifications, then
-  // list it here. The website will show a button to view/download it.
-  certifications: [
-    {
-      name: "CPR/AED for Professional Rescuers",
-      issuer: "American Red Cross",
-      date: "",
-      file: "assets/certifications/cpr-aed-professional-rescuers.pdf" // add the PDF with this exact file name
-    },
-    {
-      name: "Cancer and Exercise Training for Health and Fitness Professionals",
-      issuer: "Thrive Health Services",
-      date: "Issued Sep 2023",
-      file: "assets/certifications/cancer-exercise-training.pdf" // add the PDF with this exact file name
-    }
-  ],
+.hero-sub {
+  font-size: 17px;
+  color: var(--ink-soft);
+  max-width: 58ch;
+  margin: 0 0 36px;
+}
 
-  // ---------- LANGUAGES ----------
-  languages: [
-    { name: "Spanish", level: "Native or bilingual proficiency" }
-  ],
+.hero-actions { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 56px; }
 
-  // ---------- SKILLS ----------
-  // Just a simple list — add or remove lines.
-  skills: [
-    "Patient Communication",
-    "Anatomy & Physiology",
-    "Teamwork",
-    "Coaching",
-    "Time Management",
-    "Spanish (Bilingual)"
-  ]
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 13px 24px;
+  border-radius: 100px;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  border: 1px solid var(--ink);
+  transition: all 0.15s ease;
+}
+.btn-primary { background: var(--ink); color: var(--bg); }
+.btn-primary:hover { background: var(--accent); border-color: var(--accent); }
+.btn-ghost { background: transparent; color: var(--ink); border-color: var(--line); }
+.btn-ghost:hover { border-color: var(--ink); }
 
-};
+/* ---------- Stat row ---------- */
+.stat-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0;
+  border-top: 1px solid var(--line);
+}
+.stat {
+  padding: 28px 0 0;
+  border-right: 1px solid var(--line);
+  padding-right: 24px;
+}
+.stat:last-child { border-right: none; }
+.stat-num {
+  font-size: 36px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+.stat-label {
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+/* ---------- Sections ---------- */
+section { padding: 80px 0; border-bottom: 1px solid var(--line); }
+section:last-of-type { border-bottom: none; }
+
+.section-head { margin-bottom: 44px; max-width: 60ch; }
+h2.section-title {
+  font-size: 30px;
+  font-weight: 700;
+  margin: 10px 0 12px;
+  letter-spacing: -0.02em;
+}
+.section-desc { color: var(--ink-soft); font-size: 16px; }
+
+/* ---------- Profile / about grid ---------- */
+.profile-grid {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 56px;
+}
+.profile-text p { font-size: 17px; color: var(--ink-soft); margin: 0 0 18px; }
+.profile-text strong { color: var(--ink); }
+
+.info-list { display: flex; flex-direction: column; gap: 22px; }
+.info-item .info-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+.info-item .info-value { font-size: 16px; font-weight: 500; }
+
+/* ---------- Track record / timeline ---------- */
+.track-item {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 24px;
+  padding: 28px 0;
+  border-top: 1px solid var(--line);
+}
+.track-item:first-child { border-top: 1px solid var(--line); }
+.track-years {
+  font-size: 13px;
+  color: var(--muted);
+  padding-top: 2px;
+}
+.track-title { font-size: 19px; font-weight: 600; margin: 0 0 4px; letter-spacing: -0.01em; }
+.track-org { font-size: 14.5px; color: var(--accent); margin: 0 0 12px; font-weight: 500; }
+.track-details { font-size: 15.5px; color: var(--ink-soft); max-width: 60ch; margin: 0; }
+
+@media (max-width: 640px) {
+  .track-item { grid-template-columns: 1fr; gap: 8px; }
+}
+
+/* ---------- Certifications ---------- */
+.cert-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+}
+.cert-card {
+  background: var(--bg-raised);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 24px;
+  transition: border-color 0.15s ease, transform 0.15s ease;
+}
+.cert-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+.cert-name { font-weight: 600; font-size: 16px; margin-bottom: 6px; letter-spacing: -0.005em; }
+.cert-meta { font-size: 13px; color: var(--muted); margin-bottom: 16px; }
+.cert-link {
+  font-size: 13.5px;
+  font-weight: 600;
+  text-decoration: none;
+  color: var(--accent);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.cert-link:hover { text-decoration: underline; }
+
+/* ---------- Skills + Languages pills ---------- */
+.pill-list { display: flex; flex-wrap: wrap; gap: 10px; }
+.pill {
+  padding: 9px 18px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-radius: 100px;
+  font-size: 13.5px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 56px;
+}
+@media (max-width: 640px) {
+  .two-col, .profile-grid { grid-template-columns: 1fr; gap: 40px; }
+}
+
+/* ---------- Contact ---------- */
+.contact-cta h2.section-title { font-size: clamp(28px, 4vw, 40px); }
+.contact-line {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 16px;
+  color: var(--ink-soft);
+  margin-top: 28px;
+  flex-wrap: wrap;
+}
+.contact-line a { text-decoration: none; font-weight: 600; color: var(--ink); }
+.contact-line a:hover { color: var(--accent); }
+
+footer {
+  text-align: center;
+  padding: 36px 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+/* ---------- Accessibility ---------- */
+a:focus-visible, .btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}
