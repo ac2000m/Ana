@@ -44,3 +44,14 @@ async function saveSiteContentRow(contentObj) {
   }
   return true;
 }
+
+// Uploads a file to the public "site-assets" storage bucket and returns
+// its public URL. `folder` should be "photos" or "certifications".
+async function uploadAssetFile(file, folder) {
+  const safeName = file.name.replace(/[^a-zA-Z0-9.\-_]/g, '_');
+  const path = `${folder}/${Date.now()}-${safeName}`;
+  const { error } = await supabaseClient.storage.from('site-assets').upload(path, file);
+  if (error) throw error;
+  const { data } = supabaseClient.storage.from('site-assets').getPublicUrl(path);
+  return data.publicUrl;
+}
