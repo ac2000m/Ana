@@ -323,46 +323,75 @@ h2.section-title {
 }
 .info-item .info-value { font-size: 14.5px; font-weight: 600; color: var(--ink); }
 
-/* ---------- Track record / dotted timeline ---------- */
-.timeline-rail { position: relative; padding-left: 28px; }
-.timeline-rail::before {
+/* ---------- Track record / zigzag timeline ---------- */
+.zigzag-rail { position: relative; padding: 8px 0; }
+.zigzag-rail::before {
   content: "";
   position: absolute;
-  left: 5px;
-  top: 6px;
-  bottom: 6px;
-  width: 2px;
-  background: repeating-linear-gradient(to bottom, var(--accent-soft) 0, var(--accent-soft) 6px, transparent 6px, transparent 12px);
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  margin-left: -1.5px;
+  background: linear-gradient(to bottom, var(--accent-soft), var(--accent) 15%, var(--accent) 85%, var(--accent-soft));
+  border-radius: 4px;
 }
-.track-item {
+.zigzag-item {
   position: relative;
-  padding: 0 0 32px;
-  border-top: none;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  margin-bottom: 36px;
 }
-.track-item::before {
-  content: "";
+.zigzag-icon {
   position: absolute;
-  left: -28px;
-  top: 4px;
-  width: 12px;
-  height: 12px;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 52px;
+  height: 52px;
   border-radius: 50%;
-  background: var(--accent);
-  border: 3px solid #FFFFFF;
-  box-shadow: 0 0 0 2px var(--accent-soft);
+  background: #FFFFFF;
+  border: 3px solid var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  box-shadow: 0 6px 18px rgba(224, 69, 123, 0.20);
+  z-index: 2;
 }
-.track-item:first-child { border-top: none; }
-.track-years {
-  font-size: 13px;
-  color: var(--muted);
-  padding-top: 2px;
+.zigzag-card {
+  background: var(--bg-raised);
+  border-radius: 18px;
+  padding: 22px 26px;
+  box-shadow: 0 8px 24px rgba(224, 69, 123, 0.08);
+}
+.zigzag-item--left .zigzag-card { grid-column: 1; margin-right: 42px; text-align: right; }
+.zigzag-item--right .zigzag-card { grid-column: 2; margin-left: 42px; }
+.zigzag-item--right::after { content: ""; } /* keep grid balanced */
+.zigzag-years {
+  font-family: "Fraunces", Georgia, serif;
+  font-style: italic;
+  font-size: 14px;
+  color: var(--accent);
+  margin-bottom: 4px;
 }
 .track-title { font-size: 19px; font-weight: 600; margin: 0 0 4px; letter-spacing: -0.01em; overflow-wrap: break-word; }
-.track-org { font-size: 14.5px; color: var(--accent); margin: 0 0 12px; font-weight: 500; }
-.track-details { font-size: 15.5px; color: var(--ink-soft); max-width: 60ch; margin: 0; }
+.track-org { font-size: 14.5px; color: var(--accent); margin: 0 0 10px; font-weight: 500; }
+.track-details { font-size: 15px; color: var(--ink-soft); max-width: 46ch; margin: 0; }
+.zigzag-item--left .track-details { margin-left: auto; }
 
-@media (max-width: 640px) {
-  .track-item { grid-template-columns: 1fr; gap: 8px; }
+@media (max-width: 700px) {
+  .zigzag-rail::before { left: 24px; }
+  .zigzag-item { grid-template-columns: 1fr; margin-bottom: 28px; padding-left: 56px; }
+  .zigzag-icon { left: 24px; top: 0; transform: translate(-50%, 0); width: 42px; height: 42px; font-size: 18px; }
+  .zigzag-item--left .zigzag-card,
+  .zigzag-item--right .zigzag-card {
+    grid-column: 1;
+    margin: 0;
+    text-align: left;
+  }
+  .zigzag-item--left .track-details { margin-left: 0; }
 }
 
 /* ---------- Certifications ---------- */
