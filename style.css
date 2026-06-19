@@ -1,13 +1,13 @@
 :root {
-  --ink: #2A1A20;
-  --ink-soft: #6B4A54;
-  --muted: #B98C9A;
-  --bg: #FFFFFF;
-  --bg-raised: #FFF6F8;
-  --line: #F6DCE4;
+  --ink: #3A2530;
+  --ink-soft: #7A5560;
+  --muted: #C291A3;
+  --bg: #FDF1F5;
+  --bg-raised: #FFFFFF;
+  --line: #F3D2E0;
   --accent: #E0457B;
-  --accent-soft: #FCE4ED;
-  --radius: 10px;
+  --accent-soft: #FBDCEA;
+  --radius: 20px;
 }
 
 * { box-sizing: border-box; }
@@ -16,9 +16,9 @@ html { scroll-behavior: smooth; }
 body {
   margin: 0;
   background:
-    radial-gradient(900px 500px at 12% -8%, #FBD2E2 0%, rgba(251,210,226,0) 60%),
-    radial-gradient(700px 500px at 100% 10%, #FBE6EF 0%, rgba(251,230,239,0) 55%),
-    linear-gradient(180deg, #FFFDFE 0%, #FFF8FA 100%);
+    radial-gradient(1000px 600px at 10% -10%, #FCE0EC 0%, rgba(252,224,236,0) 55%),
+    radial-gradient(800px 600px at 100% 0%, #FAD9E8 0%, rgba(250,217,232,0) 50%),
+    linear-gradient(180deg, #FDF1F5 0%, #FCE9F0 100%);
   background-attachment: fixed;
   color: var(--ink);
   font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -26,6 +26,8 @@ body {
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
 }
+
+.serif { font-family: "Fraunces", Georgia, serif; }
 
 a { color: inherit; }
 img { max-width: 100%; display: block; }
@@ -112,15 +114,17 @@ nav .links .resume-link:hover { background: var(--ink); color: var(--bg); }
   align-items: center;
   gap: 10px;
 }
-.eyebrow .idx { color: var(--accent); font-weight: 600; }
-.eyebrow .dot { width: 4px; height: 4px; border-radius: 50%; background: var(--muted); }
+.eyebrow .idx { display: none; }
+.eyebrow .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
 
 h1.display {
+  font-family: "Fraunces", Georgia, serif;
+  font-style: italic;
   font-size: clamp(44px, 7vw, 76px);
-  line-height: 1.0;
+  line-height: 1.05;
   margin: 0 0 8px;
-  font-weight: 700;
-  letter-spacing: -0.03em;
+  font-weight: 600;
+  letter-spacing: -0.01em;
 }
 .display .accent-word { color: var(--accent); }
 
@@ -176,9 +180,10 @@ h1.display {
 }
 .stat:last-child { border-right: none; }
 .stat-num {
-  font-size: 36px;
-  font-weight: 700;
-  letter-spacing: -0.02em;
+  font-family: "Fraunces", Georgia, serif;
+  font-size: 38px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
   color: var(--accent);
 }
 .stat-label {
@@ -188,14 +193,25 @@ h1.display {
 }
 
 /* ---------- Sections ---------- */
-section { padding: 80px 0; border-bottom: 1px solid var(--line); }
-section:last-of-type { border-bottom: none; }
-section:nth-of-type(even) { background: var(--bg-raised); }
+section {
+  padding: 56px 40px;
+  margin: 28px auto;
+  max-width: 880px;
+  border-bottom: none;
+  background: var(--bg-raised);
+  border-radius: 28px;
+  box-shadow: 0 10px 40px rgba(224, 69, 123, 0.07);
+}
+section .wrap { padding: 0; max-width: none; }
+header.hero { background: transparent; box-shadow: none; padding: 90px 0 32px; margin: 0; border-radius: 0; }
+.contact-cta { background: linear-gradient(160deg, #FFFFFF 0%, var(--accent-soft) 130%); }
 
 .section-head { margin-bottom: 44px; max-width: 60ch; }
 h2.section-title {
+  font-family: "Fraunces", Georgia, serif;
+  font-style: italic;
+  font-weight: 600;
   font-size: 30px;
-  font-weight: 700;
   margin: 10px 0 12px;
   letter-spacing: -0.02em;
 }
