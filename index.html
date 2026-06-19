@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ana Chandlee</title>
+<meta name="description" content="Ana Chandlee — Doctor of Physical Therapy Candidate at UIC, Chicago.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a href="#top" class="nav-name" id="nav-name">Ana Chandlee</a>
+    <div class="links">
+      <a href="#profile">Profile</a>
+      <a href="#track-record">Experience</a>
+      <a href="#certifications">Certifications</a>
+      <a href="#contact">Contact</a>
+      <a class="resume-link" id="resume-link" href="#" target="_blank" rel="noopener">Résumé</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="wrap">
+    <div class="eyebrow">
+      <span class="idx">00</span> <span class="dot"></span> <span id="hero-eyebrow"></span>
+    </div>
+    <h1 class="display" id="hero-name"></h1>
+    <p class="hero-role" id="hero-role"></p>
+    <p class="hero-sub" id="hero-sub"></p>
+    <div class="hero-actions">
+      <a class="btn btn-primary" id="hero-email-link" href="#">Get in touch</a>
+      <a class="btn btn-ghost" id="hero-linkedin-link" href="#" target="_blank" rel="noopener">View LinkedIn</a>
+      <a class="btn btn-ghost" id="hero-resume-link" href="#" target="_blank" rel="noopener">Résumé</a>
+    </div>
+    <div class="stat-row" id="stat-row"></div>
+  </div>
+</header>
+
+<section id="profile">
+  <div class="wrap">
+    <div class="eyebrow"><span class="idx">01</span> <span class="dot"></span> Profile</div>
+    <div class="profile-grid">
+      <div class="profile-text">
+        <h2 class="section-title">The short version</h2>
+        <p id="about-text"></p>
+      </div>
+      <div>
+        <div id="photo-frame" style="width:100%; max-width:200px; aspect-ratio:4/5; border-radius:10px; overflow:hidden; background:var(--accent-soft); display:flex; align-items:center; justify-content:center; margin-bottom:24px;">
+          <span style="color:var(--accent); font-size:13px; text-align:center; padding:16px;">Loading photo…</span>
+        </div>
+        <div class="info-list" id="info-list"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="track-record">
+  <div class="wrap">
+    <div class="eyebrow"><span class="idx">02</span> <span class="dot"></span> Track record</div>
+    <div class="section-head">
+      <h2 class="section-title">Where I've been</h2>
+      <p class="section-desc">Education, clinical, and work experience.</p>
+    </div>
+    <div id="education-timeline"></div>
+    <div id="experience-timeline"></div>
+  </div>
+</section>
+
+<section id="certifications">
+  <div class="wrap">
+    <div class="eyebrow"><span class="idx">03</span> <span class="dot"></span> Certifications</div>
+    <div class="section-head">
+      <h2 class="section-title">Credentials</h2>
+    </div>
+    <div class="cert-grid" id="cert-grid"></div>
+  </div>
+</section>
+
+<section id="skills-languages">
+  <div class="wrap">
+    <div class="two-col">
+      <div>
+        <div class="eyebrow"><span class="idx">04</span> <span class="dot"></span> Skills</div>
+        <h2 class="section-title">What I bring</h2>
+        <div class="pill-list" id="skills-list"></div>
+      </div>
+      <div>
+        <div class="eyebrow"><span class="idx">05</span> <span class="dot"></span> Languages</div>
+        <h2 class="section-title">Languages</h2>
+        <div class="pill-list" id="languages-list"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="contact" class="contact-cta">
+  <div class="wrap">
+    <div class="eyebrow"><span class="idx">06</span> <span class="dot"></span> Contact</div>
+    <h2 class="section-title">Let's connect.</h2>
+    <p class="section-desc">Open to opportunities, clinical connections, and conversation.</p>
+    <div class="contact-line">
+      <span id="contact-email"></span>
+      <span>·</span>
+      <span id="contact-phone"></span>
+      <span>·</span>
+      <span id="contact-location"></span>
+    </div>
+    <div class="contact-line">
+      <span id="contact-linkedin"></span>
+    </div>
+  </div>
+</section>
+
+<footer>
+  © <span id="footer-year"></span> <span id="footer-name"></span>
+</footer>
+
+<script src="content.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
