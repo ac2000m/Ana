@@ -87,134 +87,156 @@ async function render() {
 
   document.title = `${c.name} — ${c.tagline}`;
 
-  // Nav
-  document.getElementById('nav-name').textContent = c.name;
-  const navResume = document.getElementById('resume-link');
-  if (c.resume) { navResume.href = c.resume; } else { navResume.style.display = 'none'; }
-
-  // Hero
-  document.getElementById('hero-eyebrow').textContent = `${c.tagline} — ${c.location}`;
-  document.getElementById('hero-name').textContent = c.name;
-  document.getElementById('hero-role').textContent = c.tagline;
-  document.getElementById('hero-sub').textContent = c.heroSub || c.about;
-  document.getElementById('hero-email-link').href = `mailto:${c.email}`;
-  document.getElementById('hero-linkedin-link').href = c.linkedin;
-  const heroResume = document.getElementById('hero-resume-link');
-  if (c.resume) { heroResume.href = c.resume; } else { heroResume.style.display = 'none'; }
-
-  // Stats row (auto-calculated from your content — no need to edit these numbers)
-  const statRow = document.getElementById('stat-row');
-  statRow.innerHTML = '';
-  const certCount = (c.certifications || []).length;
-  const langCount = (c.languages || []).length;
-  const stats = [
-    { num: c.clinicalHours || '0', label: 'Clinical hours' },
-    { num: certCount, label: 'Certifications' },
-    { num: langCount || 1, label: 'Languages spoken' }
-  ];
-  stats.forEach(s => {
-    statRow.appendChild(el(`
-      <div class="stat-badge">
-        <div class="stat-num">${s.num}</div>
-        <div class="stat-label">${s.label}</div>
-      </div>
-    `));
+  safe('nav', () => {
+    document.getElementById('nav-name').textContent = c.name;
+    const navResume = document.getElementById('resume-link');
+    if (c.resume) { navResume.href = c.resume; } else { navResume.style.display = 'none'; }
   });
 
-  // Profile / About
-  document.getElementById('about-text').textContent = c.about;
-
-  // Photo carousel (headshot first; arrows/dots advance manually only)
-  renderPhotoCarousel(c);
-
-  const infoList = document.getElementById('info-list');
-  infoList.innerHTML = '';
-  const currentEdu = (c.education && c.education[0]) || {};
-  const info = [
-    { label: 'Location', value: c.location },
-    { label: 'Currently', value: currentEdu.degree || '' },
-    { label: 'At', value: currentEdu.school || '' },
-    { label: 'Undergrad', value: (c.education && c.education[1] && c.education[1].school) || '' }
-  ];
-  info.forEach(i => {
-    if (!i.value) return;
-    infoList.appendChild(el(`
-      <div class="info-item">
-        <div class="info-label">${i.label}</div>
-        <div class="info-value">${i.value}</div>
-      </div>
-    `));
+  safe('hero', () => {
+    document.getElementById('hero-eyebrow').textContent = `${c.tagline} — ${c.location}`;
+    document.getElementById('hero-name').textContent = c.name;
+    document.getElementById('hero-role').textContent = c.tagline;
+    document.getElementById('hero-sub').textContent = c.heroSub || c.about;
+    document.getElementById('hero-email-link').href = `mailto:${c.email}`;
+    document.getElementById('hero-linkedin-link').href = c.linkedin;
+    const heroResume = document.getElementById('hero-resume-link');
+    if (c.resume) { heroResume.href = c.resume; } else { heroResume.style.display = 'none'; }
   });
 
-  // Track record — combined zigzag timeline (education + experience)
-  const rail = document.getElementById('zigzag-rail');
-  rail.innerHTML = '';
-  const items = []
-    .concat((c.education || []).map(e => ({ kind: 'edu', years: e.years, title: e.degree, org: e.school, details: e.details })))
-    .concat((c.experience || []).map(x => ({ kind: 'exp', years: x.years, title: x.title, org: x.organization, details: x.details })));
-
-  items.forEach((item, i) => {
-    const side = i % 2 === 0 ? 'left' : 'right';
-    const icon = item.kind === 'edu' ? '🎓' : '💼';
-    rail.appendChild(el(`
-      <div class="zigzag-item zigzag-item--${side}">
-        <div class="zigzag-icon">${icon}</div>
-        <div class="zigzag-card">
-          <div class="zigzag-years">${item.years || ''}</div>
-          <h3 class="track-title">${item.title}</h3>
-          <p class="track-org">${item.org}</p>
-          ${item.details ? `<p class="track-details">${item.details}</p>` : ''}
-        </div>
-      </div>
-    `));
-  });
-
-  // Certifications
-  const certGrid = document.getElementById('cert-grid');
-  certGrid.innerHTML = '';
-  if (c.certifications && c.certifications.length) {
-    c.certifications.forEach(cert => {
-      certGrid.appendChild(el(`
-        <div class="cert-card">
-          <div class="cert-name">${cert.name}</div>
-          <div class="cert-meta">${cert.issuer}${cert.date ? ' · ' + cert.date : ''}</div>
-          ${cert.file ? `<a class="cert-link" href="${cert.file}" target="_blank" rel="noopener" data-cert-check>View document →</a>` : ''}
+  safe('stats', () => {
+    const statRow = document.getElementById('stat-row');
+    statRow.innerHTML = '';
+    const certCount = (c.certifications || []).length;
+    const langCount = (c.languages || []).length;
+    const stats = [
+      { num: c.clinicalHours || '0', label: 'Clinical hours' },
+      { num: certCount, label: 'Certifications' },
+      { num: langCount || 1, label: 'Languages spoken' }
+    ];
+    stats.forEach(s => {
+      statRow.appendChild(el(`
+        <div class="stat-badge">
+          <div class="stat-num">${s.num}</div>
+          <div class="stat-label">${s.label}</div>
         </div>
       `));
     });
-    // Hide the link (without breaking layout) if the file 404s
-    certGrid.querySelectorAll('[data-cert-check]').forEach(link => {
-      fetch(link.href, { method: 'HEAD' })
-        .then(res => { if (!res.ok) link.replaceWith(el(`<span class="cert-link" style="opacity:.5; cursor:default;">File coming soon</span>`)); })
-        .catch(() => { link.replaceWith(el(`<span class="cert-link" style="opacity:.5; cursor:default;">File coming soon</span>`)); });
+  });
+
+  safe('about', () => {
+    document.getElementById('about-text').textContent = c.about;
+  });
+
+  safe('photo carousel', () => {
+    renderPhotoCarousel(c);
+  });
+
+  safe('info list', () => {
+    const infoList = document.getElementById('info-list');
+    infoList.innerHTML = '';
+    const currentEdu = (c.education && c.education[0]) || {};
+    const info = [
+      { label: 'Location', value: c.location },
+      { label: 'Currently', value: currentEdu.degree || '' },
+      { label: 'At', value: currentEdu.school || '' },
+      { label: 'Undergrad', value: (c.education && c.education[1] && c.education[1].school) || '' }
+    ];
+    info.forEach(i => {
+      if (!i.value) return;
+      infoList.appendChild(el(`
+        <div class="info-item">
+          <div class="info-label">${i.label}</div>
+          <div class="info-value">${i.value}</div>
+        </div>
+      `));
     });
-  } else {
-    certGrid.appendChild(el(`<p style="color:var(--muted)">No certifications added yet.</p>`));
+  });
+
+  safe('track record', () => {
+    const rail = document.getElementById('zigzag-rail');
+    rail.innerHTML = '';
+    const items = []
+      .concat((c.education || []).map(e => ({ kind: 'edu', years: e.years, title: e.degree, org: e.school, details: e.details })))
+      .concat((c.experience || []).map(x => ({ kind: 'exp', years: x.years, title: x.title, org: x.organization, details: x.details })));
+
+    items.forEach((item, i) => {
+      const side = i % 2 === 0 ? 'left' : 'right';
+      const icon = item.kind === 'edu' ? '🎓' : '💼';
+      rail.appendChild(el(`
+        <div class="zigzag-item zigzag-item--${side}">
+          <div class="zigzag-icon">${icon}</div>
+          <div class="zigzag-card">
+            <div class="zigzag-years">${item.years || ''}</div>
+            <h3 class="track-title">${item.title}</h3>
+            <p class="track-org">${item.org}</p>
+            ${item.details ? `<p class="track-details">${item.details}</p>` : ''}
+          </div>
+        </div>
+      `));
+    });
+  });
+
+  safe('certifications', () => {
+    const certGrid = document.getElementById('cert-grid');
+    certGrid.innerHTML = '';
+    if (c.certifications && c.certifications.length) {
+      c.certifications.forEach(cert => {
+        certGrid.appendChild(el(`
+          <div class="cert-card">
+            <div class="cert-name">${cert.name}</div>
+            <div class="cert-meta">${cert.issuer}${cert.date ? ' · ' + cert.date : ''}</div>
+            ${cert.file ? `<a class="cert-link" href="${cert.file}" target="_blank" rel="noopener" data-cert-check>View document →</a>` : ''}
+          </div>
+        `));
+      });
+      certGrid.querySelectorAll('[data-cert-check]').forEach(link => {
+        fetch(link.href, { method: 'HEAD' })
+          .then(res => { if (!res.ok) link.replaceWith(el(`<span class="cert-link" style="opacity:.5; cursor:default;">File coming soon</span>`)); })
+          .catch(() => { link.replaceWith(el(`<span class="cert-link" style="opacity:.5; cursor:default;">File coming soon</span>`)); });
+      });
+    } else {
+      certGrid.appendChild(el(`<p style="color:var(--muted)">No certifications added yet.</p>`));
+    }
+  });
+
+  safe('skills', () => {
+    const skillsList = document.getElementById('skills-list');
+    skillsList.innerHTML = '';
+    (c.skills || []).forEach(s => {
+      skillsList.appendChild(el(`<span class="pill">${s}</span>`));
+    });
+  });
+
+  safe('languages', () => {
+    const langList = document.getElementById('languages-list');
+    langList.innerHTML = '';
+    (c.languages || []).forEach(l => {
+      langList.appendChild(el(`<span class="pill">${l.name} — ${l.level}</span>`));
+    });
+  });
+
+  safe('contact', () => {
+    document.getElementById('contact-email').innerHTML = `<a href="mailto:${c.email}">${c.email}</a>`;
+    document.getElementById('contact-phone').textContent = c.phone;
+    document.getElementById('contact-location').textContent = c.location;
+    document.getElementById('contact-linkedin').innerHTML = `<a href="${c.linkedin}" target="_blank" rel="noopener">Connect on LinkedIn →</a>`;
+  });
+
+  safe('footer', () => {
+    document.getElementById('footer-name').textContent = c.name;
+    document.getElementById('footer-year').textContent = new Date().getFullYear();
+  });
+}
+
+// Runs a render step in isolation — if it throws, log it and keep going
+// instead of letting one broken section blank out the rest of the page.
+function safe(label, fn) {
+  try {
+    fn();
+  } catch (err) {
+    console.error(`Error rendering "${label}":`, err);
   }
-
-  // Skills
-  const skillsList = document.getElementById('skills-list');
-  skillsList.innerHTML = '';
-  (c.skills || []).forEach(s => {
-    skillsList.appendChild(el(`<span class="pill">${s}</span>`));
-  });
-
-  // Languages
-  const langList = document.getElementById('languages-list');
-  langList.innerHTML = '';
-  (c.languages || []).forEach(l => {
-    langList.appendChild(el(`<span class="pill">${l.name} — ${l.level}</span>`));
-  });
-
-  // Contact
-  document.getElementById('contact-email').innerHTML = `<a href="mailto:${c.email}">${c.email}</a>`;
-  document.getElementById('contact-phone').textContent = c.phone;
-  document.getElementById('contact-location').textContent = c.location;
-  document.getElementById('contact-linkedin').innerHTML = `<a href="${c.linkedin}" target="_blank" rel="noopener">Connect on LinkedIn →</a>`;
-
-  // Footer
-  document.getElementById('footer-name').textContent = c.name;
-  document.getElementById('footer-year').textContent = new Date().getFullYear();
 }
 
 document.addEventListener('DOMContentLoaded', render);
