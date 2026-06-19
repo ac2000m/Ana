@@ -7,6 +7,14 @@ function el(html) {
   return t.content.firstElementChild;
 }
 
+// Hides one or more elements if the file they link to hasn't been
+// uploaded yet (so buttons don't 404 before you've added your files).
+function checkFileExists(url, elements) {
+  fetch(url, { method: 'HEAD' })
+    .then(res => { if (!res.ok) elements.forEach(e => e.style.display = 'none'); })
+    .catch(() => elements.forEach(e => e.style.display = 'none'));
+}
+
 function render() {
   const c = SITE_CONTENT;
 
@@ -15,7 +23,7 @@ function render() {
   // Nav
   document.getElementById('nav-name').textContent = c.name;
   const navResume = document.getElementById('resume-link');
-  if (c.resume) { navResume.href = c.resume; } else { navResume.style.display = 'none'; }
+  if (c.resume) { navResume.href = c.resume; checkFileExists(c.resume, [navResume]); } else { navResume.style.display = 'none'; }
 
   // Hero
   document.getElementById('hero-eyebrow').textContent = `${c.tagline} — ${c.location}`;
@@ -25,7 +33,7 @@ function render() {
   document.getElementById('hero-email-link').href = `mailto:${c.email}`;
   document.getElementById('hero-linkedin-link').href = c.linkedin;
   const heroResume = document.getElementById('hero-resume-link');
-  if (c.resume) { heroResume.href = c.resume; } else { heroResume.style.display = 'none'; }
+  if (c.resume) { heroResume.href = c.resume; checkFileExists(c.resume, [heroResume]); } else { heroResume.style.display = 'none'; }
 
   // Stats row (auto-calculated from your content — no need to edit these numbers)
   const statRow = document.getElementById('stat-row');
@@ -128,9 +136,15 @@ function render() {
         <div class="cert-card">
           <div class="cert-name">${cert.name}</div>
           <div class="cert-meta">${cert.issuer}${cert.date ? ' · ' + cert.date : ''}</div>
-          <a class="cert-link" href="${cert.file}" target="_blank" rel="noopener">View certificate (PDF) →</a>
+          <a class="cert-link" href="${cert.file}" target="_blank" rel="noopener" data-cert-check>View certificate (PDF) →</a>
         </div>
       `));
+    });
+    // Hide the link (without breaking layout) if the PDF hasn't been uploaded yet
+    certGrid.querySelectorAll('[data-cert-check]').forEach(link => {
+      fetch(link.href, { method: 'HEAD' })
+        .then(res => { if (!res.ok) link.replaceWith(el(`<span class="cert-link" style="opacity:.5; cursor:default;">PDF coming soon</span>`)); })
+        .catch(() => { link.replaceWith(el(`<span class="cert-link" style="opacity:.5; cursor:default;">PDF coming soon</span>`)); });
     });
   } else {
     certGrid.appendChild(el(`<p style="color:var(--muted)">No certifications added yet.</p>`));
