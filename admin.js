@@ -25,14 +25,24 @@ async function tryLogin() {
   const email = document.getElementById('email-input').value.trim();
   const password = document.getElementById('password-input').value;
   const errorEl = document.getElementById('password-error');
-  errorEl.textContent = '';
+  errorEl.textContent = 'Logging in…';
 
-  const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-  if (error) {
-    errorEl.textContent = "Couldn't log in — check your email and password.";
-    return;
+  try {
+    if (typeof supabaseClient === 'undefined') {
+      errorEl.textContent = 'Setup error: Supabase failed to load. Check your internet connection and refresh.';
+      return;
+    }
+    const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+    if (error) {
+      errorEl.textContent = 'Login failed: ' + error.message;
+      return;
+    }
+    errorEl.textContent = '';
+    await enterAdmin();
+  } catch (err) {
+    errorEl.textContent = 'Unexpected error: ' + (err && err.message ? err.message : String(err));
+    console.error(err);
   }
-  await enterAdmin();
 }
 
 async function enterAdmin() {
