@@ -40,9 +40,8 @@ function render() {
   statRow.innerHTML = '';
   const certCount = (c.certifications || []).length;
   const langCount = (c.languages || []).length;
-  const schoolCount = (c.education || []).length;
   const stats = [
-    { num: schoolCount, label: 'Schools attended' },
+    { num: c.clinicalHours || '0', label: 'Clinical hours' },
     { num: certCount, label: 'Certifications' },
     { num: langCount || 1, label: 'Languages spoken' }
   ];
