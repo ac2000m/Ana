@@ -146,39 +146,28 @@ async function render() {
     `));
   });
 
-  // Track record — Education
-  const eduTl = document.getElementById('education-timeline');
-  eduTl.innerHTML = '';
-  c.education.forEach(e => {
-    eduTl.appendChild(el(`
-      <div class="track-item">
-        <div class="track-years">${e.years}</div>
-        <div>
-          <h3 class="track-title">${e.degree}</h3>
-          <p class="track-org">${e.school}</p>
-          ${e.details ? `<p class="track-details">${e.details}</p>` : ''}
+  // Track record — combined zigzag timeline (education + experience)
+  const rail = document.getElementById('zigzag-rail');
+  rail.innerHTML = '';
+  const items = []
+    .concat((c.education || []).map(e => ({ kind: 'edu', years: e.years, title: e.degree, org: e.school, details: e.details })))
+    .concat((c.experience || []).map(x => ({ kind: 'exp', years: x.years, title: x.title, org: x.organization, details: x.details })));
+
+  items.forEach((item, i) => {
+    const side = i % 2 === 0 ? 'left' : 'right';
+    const icon = item.kind === 'edu' ? '🎓' : '💼';
+    rail.appendChild(el(`
+      <div class="zigzag-item zigzag-item--${side}">
+        <div class="zigzag-icon">${icon}</div>
+        <div class="zigzag-card">
+          <div class="zigzag-years">${item.years || ''}</div>
+          <h3 class="track-title">${item.title}</h3>
+          <p class="track-org">${item.org}</p>
+          ${item.details ? `<p class="track-details">${item.details}</p>` : ''}
         </div>
       </div>
     `));
   });
-
-  // Track record — Experience
-  const expTl = document.getElementById('experience-timeline');
-  expTl.innerHTML = '';
-  if (c.experience && c.experience.length) {
-    c.experience.forEach(x => {
-      expTl.appendChild(el(`
-        <div class="track-item">
-          <div class="track-years">${x.years || ''}</div>
-          <div>
-            <h3 class="track-title">${x.title}</h3>
-            <p class="track-org">${x.organization}</p>
-            ${x.details ? `<p class="track-details">${x.details}</p>` : ''}
-          </div>
-        </div>
-      `));
-    });
-  }
 
   // Certifications
   const certGrid = document.getElementById('cert-grid');
