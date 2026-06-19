@@ -79,7 +79,13 @@ function renderForm() {
         <div class="field"><label>Phone</label><input id="f-phone" value="${esc(working.phone)}"></div>
       </div>
       <div class="field"><label>LinkedIn URL</label><input id="f-linkedin" value="${esc(working.linkedin)}"></div>
-      <div class="field"><label>Résumé file (in assets/resume)</label><input id="f-resume" value="${esc(working.resume)}"></div>
+      <div class="field">
+        <label>Résumé</label>
+        ${working.resume ? `<a href="${esc(working.resume)}" target="_blank" rel="noopener" style="display:block; font-size:13.5px; color:var(--accent); font-weight:600; word-break:break-all; margin-bottom:8px;">${esc(working.resume)}</a>` : ''}
+        <label class="btn-soft" for="resume-upload-input" style="cursor:pointer; display:inline-flex;">${working.resume ? 'Replace résumé' : 'Upload résumé'}</label>
+        <input type="file" id="resume-upload-input" accept=".pdf" style="display:none;">
+        <span id="resume-upload-status" class="note" style="margin-left:8px;"></span>
+      </div>
     </div>
   `));
 
@@ -93,39 +99,83 @@ function renderForm() {
   const photosCard = el(`
     <div class="admin-card">
       <h2>Photos</h2>
-      <p class="note">First photo is your headshot and shows by default on the site. Upload image files to GitHub under <strong>assets/photos</strong> first, then list the file names here — visitors can click an arrow to see more.</p>
+      <p class="note">First photo is your headshot and shows by default on the site. Click "Upload a photo" and pick a file — it goes straight onto the site, no code needed.</p>
       <div id="photo-list"></div>
-      <button type="button" class="btn-soft" id="add-photo-btn">+ Add a photo</button>
+      <label class="btn-soft" for="photo-upload-input" style="cursor:pointer;">+ Upload a photo</label>
+      <input type="file" id="photo-upload-input" accept="image/*" style="display:none;">
+      <div id="photo-upload-status" class="note" style="margin-top:8px; margin-bottom:0;"></div>
     </div>
   `);
   root.appendChild(photosCard);
   renderPhotoList();
 
-  document.getElementById('add-photo-btn').addEventListener('click', () => {
-    working.photos = working.photos || [];
-    working.photos.push('assets/photos/');
-    renderPhotoList();
+  document.getElementById('photo-upload-input').addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const statusEl = document.getElementById('photo-upload-status');
+    statusEl.textContent = 'Uploading…';
+    try {
+      const url = await uploadAssetFile(file, 'photos');
+      working.photos = working.photos || [];
+      working.photos.push(url);
+      renderPhotoList();
+      statusEl.textContent = 'Uploaded!';
+      setTimeout(() => { statusEl.textContent = ''; }, 2500);
+    } catch (err) {
+      statusEl.textContent = 'Upload failed: ' + (err && err.message ? err.message : String(err));
+    }
+    e.target.value = '';
   });
 
   const credCard = el(`
     <div class="admin-card">
       <h2>Credentials &amp; documents</h2>
-      <p class="note">Certifications, your diploma, transcript, licenses — anything you want visitors to be able to view. Upload the actual PDF or image file to GitHub under <strong>assets/certifications</strong> first, then add it here with the exact file name.</p>
+      <p class="note">Certifications, your diploma, transcript, licenses — anything you want visitors to be able to view or download. Upload the file and fill in a name; no code needed.</p>
       <div id="cred-list"></div>
-      <button type="button" class="btn-soft" id="add-cred-btn">+ Add a credential</button>
+      <label class="btn-soft" for="cred-upload-input" style="cursor:pointer;">+ Upload a credential</label>
+      <input type="file" id="cred-upload-input" accept=".pdf,image/*" style="display:none;">
+      <div id="cred-upload-status" class="note" style="margin-top:8px; margin-bottom:0;"></div>
     </div>
   `);
   root.appendChild(credCard);
   renderCredList();
 
-  document.getElementById('add-cred-btn').addEventListener('click', () => {
-    working.certifications = working.certifications || [];
-    working.certifications.push({ name: '', issuer: '', date: '', file: 'assets/certifications/' });
-    renderCredList();
+  document.getElementById('cred-upload-input').addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const statusEl = document.getElementById('cred-upload-status');
+    statusEl.textContent = 'Uploading…';
+    try {
+      const url = await uploadAssetFile(file, 'certifications');
+      working.certifications = working.certifications || [];
+      const niceName = file.name.replace(/\.[^.]+$/, '').replace(/[_-]/g, ' ');
+      working.certifications.push({ name: niceName, issuer: '', date: '', file: url });
+      renderCredList();
+      statusEl.textContent = 'Uploaded! Fill in the name below.';
+      setTimeout(() => { statusEl.textContent = ''; }, 3500);
+    } catch (err) {
+      statusEl.textContent = 'Upload failed: ' + (err && err.message ? err.message : String(err));
+    }
+    e.target.value = '';
+  });
+
+  document.getElementById('resume-upload-input').addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const statusEl = document.getElementById('resume-upload-status');
+    statusEl.textContent = 'Uploading…';
+    try {
+      const url = await uploadAssetFile(file, 'resume');
+      working.resume = url;
+      statusEl.textContent = 'Uploaded!';
+      renderForm();
+    } catch (err) {
+      statusEl.textContent = 'Upload failed: ' + (err && err.message ? err.message : String(err));
+    }
   });
 
   // Wire up basic field listeners
-  ['name','tagline','location','email','phone','linkedin','resume','about'].forEach(key => {
+  ['name','tagline','location','email','phone','linkedin','about'].forEach(key => {
     const node = document.getElementById('f-' + key);
     if (node) node.addEventListener('input', () => { working[key] = node.value; });
   });
@@ -136,18 +186,16 @@ function renderPhotoList() {
   list.innerHTML = '';
   (working.photos || []).forEach((path, i) => {
     const item = el(`
-      <div class="cred-item">
-        <button type="button" class="remove-btn" data-i="${i}">Remove ✕</button>
-        <div class="field"><label>${i === 0 ? 'Headshot (shown first)' : 'Photo ' + (i + 1)}</label><input data-photo-i="${i}" value="${esc(path)}" placeholder="assets/photos/your-file.jpg"></div>
+      <div class="cred-item" style="display:flex; align-items:center; gap:14px;">
+        <img src="${esc(path)}" style="width:56px; height:56px; object-fit:cover; border-radius:10px; background:var(--accent-soft, #FBDCEA); flex-shrink:0;" onerror="this.style.opacity=0.3">
+        <div style="flex:1; min-width:0;">
+          <div style="font-size:13px; font-weight:600; color:var(--ink);">${i === 0 ? 'Headshot (shown first)' : 'Photo ' + (i + 1)}</div>
+          <div style="font-size:12px; color:var(--muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${esc(path)}</div>
+        </div>
+        <button type="button" class="remove-btn" data-i="${i}" style="position:static;">Remove ✕</button>
       </div>
     `);
     list.appendChild(item);
-  });
-  list.querySelectorAll('input').forEach(input => {
-    input.addEventListener('input', () => {
-      const i = Number(input.dataset.photoI);
-      working.photos[i] = input.value;
-    });
   });
   list.querySelectorAll('.remove-btn').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -170,7 +218,10 @@ function renderCredList() {
           <div class="field"><label>Issuer</label><input data-field="issuer" data-i="${i}" value="${esc(cred.issuer)}" placeholder="e.g. Loras College"></div>
           <div class="field"><label>Date</label><input data-field="date" data-i="${i}" value="${esc(cred.date)}" placeholder="e.g. May 2025"></div>
         </div>
-        <div class="field"><label>File name (in assets/certifications)</label><input data-field="file" data-i="${i}" value="${esc(cred.file)}" placeholder="assets/certifications/loras-diploma.pdf"></div>
+        <div class="field">
+          <label>File</label>
+          <a href="${esc(cred.file)}" target="_blank" rel="noopener" style="font-size:13.5px; color:var(--accent); font-weight:600; word-break:break-all;">${esc(cred.file)}</a>
+        </div>
       </div>
     `);
     list.appendChild(item);
