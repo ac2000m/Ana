@@ -15,6 +15,60 @@ function checkFileExists(url, elements) {
     .catch(() => elements.forEach(e => e.style.display = 'none'));
 }
 
+// Renders the hero photo. First photo is the headshot and shows by default.
+// Photos never auto-advance — only the arrows/dots change which one shows.
+function renderPhotoCarousel(c) {
+  const photos = (c.photos && c.photos.length) ? c.photos : (c.photo ? [c.photo] : []);
+  const frame = document.getElementById('photo-frame');
+  const prevBtn = document.getElementById('photo-prev');
+  const nextBtn = document.getElementById('photo-next');
+  const dotsWrap = document.getElementById('photo-dots');
+  if (!frame) return;
+
+  if (!photos.length) {
+    frame.innerHTML = `<span class="photo-placeholder">Add a photo at<br><strong>assets/photos/</strong></span>`;
+    if (prevBtn) prevBtn.hidden = true;
+    if (nextBtn) nextBtn.hidden = true;
+    return;
+  }
+
+  let index = 0;
+
+  function showPhoto(i) {
+    index = (i + photos.length) % photos.length;
+    frame.innerHTML = '';
+    const img = new Image();
+    img.alt = c.name;
+    img.onerror = () => {
+      frame.innerHTML = `<span class="photo-placeholder">Add your photo at<br><strong>${photos[index]}</strong></span>`;
+    };
+    img.src = photos[index];
+    frame.appendChild(img);
+
+    if (dotsWrap) {
+      dotsWrap.innerHTML = '';
+      if (photos.length > 1) {
+        photos.forEach((_, i2) => {
+          const dot = el(`<button type="button" class="photo-dot${i2 === index ? ' active' : ''}" aria-label="Show photo ${i2 + 1}"></button>`);
+          dot.addEventListener('click', () => showPhoto(i2));
+          dotsWrap.appendChild(dot);
+        });
+      }
+    }
+  }
+
+  // Only one photo: hide arrows entirely, photo never changes.
+  const multi = photos.length > 1;
+  if (prevBtn) prevBtn.hidden = !multi;
+  if (nextBtn) nextBtn.hidden = !multi;
+  if (multi) {
+    prevBtn.onclick = () => showPhoto(index - 1);
+    nextBtn.onclick = () => showPhoto(index + 1);
+  }
+
+  showPhoto(0); // headshot first, no auto-advance
+}
+
 function render() {
   const c = SITE_CONTENT;
 
@@ -57,21 +111,8 @@ function render() {
   // Profile / About
   document.getElementById('about-text').textContent = c.about;
 
-  // Photo
-  const photoFrame = document.getElementById('photo-frame');
-  const img = new Image();
-  img.onload = () => {
-    photoFrame.innerHTML = '';
-    img.style.width = '100%';
-    img.style.height = '100%';
-    img.style.objectFit = 'cover';
-    photoFrame.appendChild(img);
-  };
-  img.onerror = () => {
-    photoFrame.innerHTML = `<span class="photo-placeholder">Add your photo at<br><strong>${c.photo}</strong></span>`;
-  };
-  img.src = c.photo;
-  img.alt = c.name;
+  // Photo carousel (headshot first; arrows/dots advance manually only)
+  renderPhotoCarousel(c);
 
   const infoList = document.getElementById('info-list');
   infoList.innerHTML = '';
@@ -175,3 +216,19 @@ function render() {
 }
 
 document.addEventListener('DOMContentLoaded', render);
+
+// Cursor-following glow
+(function () {
+  const glow = document.getElementById('cursor-glow');
+  if (!glow) return;
+  let raf = null;
+  document.addEventListener('mousemove', (e) => {
+    glow.classList.add('active');
+    if (raf) return;
+    raf = requestAnimationFrame(() => {
+      glow.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
+      raf = null;
+    });
+  });
+  document.addEventListener('mouseleave', () => glow.classList.remove('active'));
+})();
