@@ -34,12 +34,12 @@ body {
   position: fixed;
   top: 0;
   left: 0;
-  width: 480px;
-  height: 480px;
-  margin-left: -240px;
-  margin-top: -240px;
+  width: 280px;
+  height: 280px;
+  margin-left: -140px;
+  margin-top: -140px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(216, 28, 92, 0.20) 0%, rgba(216, 28, 92, 0) 70%);
+  background: radial-gradient(circle, rgba(216, 28, 92, 0.22) 0%, rgba(216, 28, 92, 0) 70%);
   pointer-events: none;
   z-index: 0;
   transform: translate(-1000px, -1000px);
@@ -357,7 +357,7 @@ h2.section-title {
   color: var(--muted);
   padding-top: 2px;
 }
-.track-title { font-size: 19px; font-weight: 600; margin: 0 0 4px; letter-spacing: -0.01em; }
+.track-title { font-size: 19px; font-weight: 600; margin: 0 0 4px; letter-spacing: -0.01em; overflow-wrap: break-word; }
 .track-org { font-size: 14.5px; color: var(--accent); margin: 0 0 12px; font-weight: 500; }
 .track-details { font-size: 15.5px; color: var(--ink-soft); max-width: 60ch; margin: 0; }
 
@@ -380,7 +380,7 @@ h2.section-title {
   transition: border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
 }
 .cert-card:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(224, 69, 123, 0.12); }
-.cert-name { font-weight: 600; font-size: 16px; margin-bottom: 6px; letter-spacing: -0.005em; }
+.cert-name { font-weight: 600; font-size: 16px; margin-bottom: 6px; letter-spacing: -0.005em; overflow-wrap: break-word; }
 .cert-meta { font-size: 13px; color: var(--muted); margin-bottom: 16px; }
 .cert-link {
   font-size: 13.5px;
