@@ -96,7 +96,7 @@ async function render() {
   document.getElementById('hero-eyebrow').textContent = `${c.tagline} — ${c.location}`;
   document.getElementById('hero-name').textContent = c.name;
   document.getElementById('hero-role').textContent = c.tagline;
-  document.getElementById('hero-sub').textContent = c.about;
+  document.getElementById('hero-sub').textContent = c.heroSub || c.about;
   document.getElementById('hero-email-link').href = `mailto:${c.email}`;
   document.getElementById('hero-linkedin-link').href = c.linkedin;
   const heroResume = document.getElementById('hero-resume-link');
@@ -189,15 +189,15 @@ async function render() {
         <div class="cert-card">
           <div class="cert-name">${cert.name}</div>
           <div class="cert-meta">${cert.issuer}${cert.date ? ' · ' + cert.date : ''}</div>
-          <a class="cert-link" href="${cert.file}" target="_blank" rel="noopener" data-cert-check>View certificate (PDF) →</a>
+          ${cert.file ? `<a class="cert-link" href="${cert.file}" target="_blank" rel="noopener" data-cert-check>View document →</a>` : ''}
         </div>
       `));
     });
-    // Hide the link (without breaking layout) if the PDF hasn't been uploaded yet
+    // Hide the link (without breaking layout) if the file 404s
     certGrid.querySelectorAll('[data-cert-check]').forEach(link => {
       fetch(link.href, { method: 'HEAD' })
-        .then(res => { if (!res.ok) link.replaceWith(el(`<span class="cert-link" style="opacity:.5; cursor:default;">PDF coming soon</span>`)); })
-        .catch(() => { link.replaceWith(el(`<span class="cert-link" style="opacity:.5; cursor:default;">PDF coming soon</span>`)); });
+        .then(res => { if (!res.ok) link.replaceWith(el(`<span class="cert-link" style="opacity:.5; cursor:default;">File coming soon</span>`)); })
+        .catch(() => { link.replaceWith(el(`<span class="cert-link" style="opacity:.5; cursor:default;">File coming soon</span>`)); });
     });
   } else {
     certGrid.appendChild(el(`<p style="color:var(--muted)">No certifications added yet.</p>`));
