@@ -24,20 +24,20 @@ const SITE_CONTENT = {
   phone: "(555) 123-4567",
   linkedin: "https://www.linkedin.com/in/ana-chandlee", // replace with your real LinkedIn URL
 
-  // ---------- RESUME PDF ----------
-  // Optional: add a PDF of your résumé to assets/certifications (or a new
-  // assets/resume folder) and put its file name here. The "Résumé" button
-  // will link to it. Leave as-is if you don't want a résumé button yet.
-  resume: "assets/resume/ana-chandlee-resume.pdf",
+  // ---------- RESUME, PHOTOS & CREDENTIALS ----------
+  // These are now best managed from the Edit page (admin.html) — log in
+  // there and use the "Upload" buttons. Uploaded files get saved to the
+  // site automatically, no code edits needed.
+  // The values below are just the starting defaults before anything's
+  // been uploaded.
+  resume: "",
 
   // ---------- PHOTOS ----------
   // First photo should be the headshot — it shows by default.
   // Add more photos to the array and visitors can click the arrow to see them.
   // Put each photo file inside the assets/photos folder, then list its file name here.
   photos: [
-    "assets/photos/ana-headshot.jpg" // headshot — shown first
-    // "assets/photos/ana-photo-2.jpg",
-    // "assets/photos/ana-photo-3.jpg"
+    "assets/photos/ana-headshot.jpg" // starting default — replace via the Edit page
   ],
 
   // ---------- STATS ----------
@@ -85,9 +85,10 @@ const SITE_CONTENT = {
     }
   ],
 
-  // ---------- CERTIFICATIONS ----------
-  // Put each certification PDF inside assets/certifications, then
-  // list it here. The website will show a button to view/download it.
+  // ---------- CREDENTIALS (starting defaults) ----------
+  // Certifications, diploma, transcript — anything you want people to view.
+  // Best managed from the Edit page (admin.html) now — upload files there
+  // and they get added automatically. These are just the starting defaults.
   certifications: [
     {
       name: "CPR/AED for Professional Rescuers",
@@ -101,6 +102,19 @@ const SITE_CONTENT = {
       date: "Issued Sep 2023",
       file: "assets/certifications/cancer-exercise-training.pdf" // add the PDF with this exact file name
     }
+    // Example — uncomment and fill in once you've added the file:
+    // {
+    //   name: "Loras College Diploma",
+    //   issuer: "Loras College",
+    //   date: "May 2025",
+    //   file: "assets/certifications/loras-diploma.pdf"
+    // },
+    // {
+    //   name: "Official Transcript",
+    //   issuer: "Loras College",
+    //   date: "",
+    //   file: "assets/certifications/loras-transcript.pdf"
+    // }
   ],
 
   // ---------- LANGUAGES ----------
