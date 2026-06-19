@@ -12,6 +12,8 @@
 </head>
 <body>
 
+<div id="cursor-glow"></div>
+
 <nav>
   <div class="wrap">
     <a href="#top" class="nav-name" id="nav-name">Ana Chandlee</a>
@@ -41,8 +43,13 @@
       </div>
     </div>
     <div class="hero-photo-col">
-      <div id="photo-frame" class="hero-photo">
-        <span class="photo-placeholder">Loading photo…</span>
+      <div class="hero-photo-carousel">
+        <div id="photo-frame" class="hero-photo">
+          <span class="photo-placeholder">Loading photo…</span>
+        </div>
+        <button type="button" class="photo-arrow photo-arrow--prev" id="photo-prev" aria-label="Previous photo">‹</button>
+        <button type="button" class="photo-arrow photo-arrow--next" id="photo-next" aria-label="Next photo">›</button>
+        <div class="photo-dots" id="photo-dots"></div>
       </div>
     </div>
   </div>
@@ -111,15 +118,17 @@
     <div class="eyebrow"><span class="dot"></span> Contact</div>
     <h2 class="section-title">Let's connect.</h2>
     <p class="section-desc">Open to opportunities, clinical connections, and conversation.</p>
-    <div class="contact-line">
-      <span id="contact-email"></span>
-      <span>·</span>
-      <span id="contact-phone"></span>
-      <span>·</span>
-      <span id="contact-location"></span>
-    </div>
-    <div class="contact-line">
-      <span id="contact-linkedin"></span>
+    <div class="contact-details-card">
+      <div class="contact-line">
+        <span id="contact-email"></span>
+        <span>·</span>
+        <span id="contact-phone"></span>
+        <span>·</span>
+        <span id="contact-location"></span>
+      </div>
+      <div class="contact-line">
+        <span id="contact-linkedin"></span>
+      </div>
     </div>
   </div>
 </section>
