@@ -90,6 +90,7 @@
     <div class="eyebrow"><span class="dot"></span> Certifications</div>
     <div class="section-head">
       <h2 class="section-title">Credentials</h2>
+      <p class="section-desc">Certifications, diploma, transcript — view or download anytime.</p>
     </div>
     <div class="cert-grid" id="cert-grid"></div>
   </div>
@@ -135,9 +136,14 @@
 
 <footer>
   © <span id="footer-year"></span> <span id="footer-name"></span>
+  <div style="margin-top:10px;">
+    <a href="admin.html" style="display:inline-flex; align-items:center; gap:6px; padding:8px 18px; border-radius:100px; border:1px solid var(--line); color:var(--ink-soft); text-decoration:none; font-size:13px; font-weight:600;">Admin login</a>
+  </div>
 </footer>
 
 <script src="content.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
 <script src="script.js"></script>
 </body>
 </html>
