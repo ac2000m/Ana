@@ -69,8 +69,21 @@ function renderPhotoCarousel(c) {
   showPhoto(0); // headshot first, no auto-advance
 }
 
-function render() {
-  const c = SITE_CONTENT;
+// Picks up any saved edits from Supabase (made via the Edit page).
+// Falls back to the defaults in content.js if nothing's been saved,
+// or if Supabase isn't reachable.
+async function getSavedOverrides() {
+  try {
+    const saved = await fetchSiteContentRow();
+    return saved || {};
+  } catch (e) {
+    return {};
+  }
+}
+
+async function render() {
+  const overrides = await getSavedOverrides();
+  const c = Object.assign({}, SITE_CONTENT, overrides);
 
   document.title = `${c.name} — ${c.tagline}`;
 
