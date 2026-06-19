@@ -33,6 +33,19 @@
     font-size: 13.5px; font-weight: 600; cursor: pointer; text-decoration: none;
   }
   .btn-soft:hover { background: var(--accent); color: #fff; }
+  .dropzone {
+    border: 2px dashed var(--line);
+    border-radius: 16px;
+    padding: 28px 20px;
+    text-align: center;
+    cursor: pointer;
+    background: var(--bg-raised, #FFF6F8);
+    transition: border-color 0.15s ease, background 0.15s ease;
+  }
+  .dropzone:hover, .dropzone.dragover { border-color: var(--accent); background: var(--accent-soft, #FBDCEA); }
+  .dropzone .dz-title { font-size: 14px; font-weight: 600; color: var(--ink); margin-bottom: 4px; }
+  .dropzone .dz-sub { font-size: 12.5px; color: var(--muted); }
+  .dropzone input[type="file"] { display: none; }
   .btn-dark {
     display: inline-flex; align-items: center; gap: 6px; padding: 13px 26px; border-radius: 100px;
     border: none; background: var(--ink); color: #fff; font-size: 14.5px; font-weight: 600; cursor: pointer;
