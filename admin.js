@@ -82,9 +82,12 @@ function renderForm() {
       <div class="field">
         <label>Résumé</label>
         ${working.resume ? `<a href="${esc(working.resume)}" target="_blank" rel="noopener" style="display:block; font-size:13.5px; color:var(--accent); font-weight:600; word-break:break-all; margin-bottom:8px;">${esc(working.resume)}</a>` : ''}
-        <label class="btn-soft" for="resume-upload-input" style="cursor:pointer; display:inline-flex;">${working.resume ? 'Replace résumé' : 'Upload résumé'}</label>
-        <input type="file" id="resume-upload-input" accept=".pdf" style="display:none;">
-        <span id="resume-upload-status" class="note" style="margin-left:8px;"></span>
+        <div class="dropzone" id="resume-dropzone">
+          <div class="dz-title">${working.resume ? 'Drop a file to replace it, or click to browse' : 'Drag a PDF here, or click to browse'}</div>
+          <div class="dz-sub">PDF only</div>
+          <input type="file" id="resume-upload-input" accept=".pdf">
+        </div>
+        <span id="resume-upload-status" class="note" style="display:block; margin-top:8px;"></span>
       </div>
     </div>
   `));
@@ -99,19 +102,20 @@ function renderForm() {
   const photosCard = el(`
     <div class="admin-card">
       <h2>Photos</h2>
-      <p class="note">First photo is your headshot and shows by default on the site. Click "Upload a photo" and pick a file — it goes straight onto the site, no code needed.</p>
+      <p class="note">First photo is your headshot and shows by default on the site. Drag a photo in, or click to browse — it goes straight onto the site, no code needed.</p>
       <div id="photo-list"></div>
-      <label class="btn-soft" for="photo-upload-input" style="cursor:pointer;">+ Upload a photo</label>
-      <input type="file" id="photo-upload-input" accept="image/*" style="display:none;">
+      <div class="dropzone" id="photo-dropzone">
+        <div class="dz-title">Drag a photo here, or click to browse</div>
+        <div class="dz-sub">JPG, PNG, etc.</div>
+        <input type="file" id="photo-upload-input" accept="image/*">
+      </div>
       <div id="photo-upload-status" class="note" style="margin-top:8px; margin-bottom:0;"></div>
     </div>
   `);
   root.appendChild(photosCard);
   renderPhotoList();
 
-  document.getElementById('photo-upload-input').addEventListener('change', async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+  setupDropzone('photo-dropzone', 'photo-upload-input', async (file) => {
     const statusEl = document.getElementById('photo-upload-status');
     statusEl.textContent = 'Uploading…';
     try {
@@ -124,25 +128,25 @@ function renderForm() {
     } catch (err) {
       statusEl.textContent = 'Upload failed: ' + (err && err.message ? err.message : String(err));
     }
-    e.target.value = '';
   });
 
   const credCard = el(`
     <div class="admin-card">
       <h2>Credentials &amp; documents</h2>
-      <p class="note">Certifications, your diploma, transcript, licenses — anything you want visitors to be able to view or download. Upload the file and fill in a name; no code needed.</p>
+      <p class="note">Certifications, your diploma, transcript, licenses — anything you want visitors to be able to view or download. Drag a file in, or click to browse; fill in a name after.</p>
       <div id="cred-list"></div>
-      <label class="btn-soft" for="cred-upload-input" style="cursor:pointer;">+ Upload a credential</label>
-      <input type="file" id="cred-upload-input" accept=".pdf,image/*" style="display:none;">
+      <div class="dropzone" id="cred-dropzone">
+        <div class="dz-title">Drag a file here, or click to browse</div>
+        <div class="dz-sub">PDF or image</div>
+        <input type="file" id="cred-upload-input" accept=".pdf,image/*">
+      </div>
       <div id="cred-upload-status" class="note" style="margin-top:8px; margin-bottom:0;"></div>
     </div>
   `);
   root.appendChild(credCard);
   renderCredList();
 
-  document.getElementById('cred-upload-input').addEventListener('change', async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+  setupDropzone('cred-dropzone', 'cred-upload-input', async (file) => {
     const statusEl = document.getElementById('cred-upload-status');
     statusEl.textContent = 'Uploading…';
     try {
@@ -156,12 +160,9 @@ function renderForm() {
     } catch (err) {
       statusEl.textContent = 'Upload failed: ' + (err && err.message ? err.message : String(err));
     }
-    e.target.value = '';
   });
 
-  document.getElementById('resume-upload-input').addEventListener('change', async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+  setupDropzone('resume-dropzone', 'resume-upload-input', async (file) => {
     const statusEl = document.getElementById('resume-upload-status');
     statusEl.textContent = 'Uploading…';
     try {
@@ -245,6 +246,42 @@ function renderCredList() {
 
 function esc(str) {
   return (str || '').toString().replace(/"/g, '&quot;').replace(/</g, '&lt;');
+}
+
+// Wires a dropzone div + its hidden file input for both click-to-browse
+// and real drag-and-drop. `onFile` is called with the chosen File.
+function setupDropzone(zoneId, inputId, onFile) {
+  const zone = document.getElementById(zoneId);
+  const input = document.getElementById(inputId);
+  if (!zone || !input) return;
+
+  zone.addEventListener('click', () => input.click());
+  input.addEventListener('change', () => {
+    if (input.files && input.files[0]) onFile(input.files[0]);
+    input.value = '';
+  });
+
+  ['dragenter', 'dragover'].forEach(evt => {
+    zone.addEventListener(evt, (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      zone.classList.add('dragover');
+    });
+  });
+  ['dragleave', 'dragend'].forEach(evt => {
+    zone.addEventListener(evt, (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      zone.classList.remove('dragover');
+    });
+  });
+  zone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    zone.classList.remove('dragover');
+    const file = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+    if (file) onFile(file);
+  });
 }
 
 // ---------- Save / export ----------
