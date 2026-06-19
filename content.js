@@ -35,6 +35,10 @@ const SITE_CONTENT = {
   // type its file name here (must match exactly, including .jpg or .png)
   photo: "assets/photos/ana-headshot.jpg", // already added for you
 
+  // ---------- STATS ----------
+  // Shown in the stat row under the hero. Edit the number any time.
+  clinicalHours: "0", // e.g. "120" — update as your clinical hours add up
+
   // ---------- ABOUT ----------
   // This is your intro paragraph. Write it like you're
   // introducing yourself to someone in person.
@@ -111,3 +115,4 @@ const SITE_CONTENT = {
   ]
 
 };
+
