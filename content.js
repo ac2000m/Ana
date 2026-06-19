@@ -30,10 +30,15 @@ const SITE_CONTENT = {
   // will link to it. Leave as-is if you don't want a résumé button yet.
   resume: "assets/resume/ana-chandlee-resume.pdf",
 
-  // ---------- PHOTO ----------
-  // Put your photo file inside the assets/photos folder, then
-  // type its file name here (must match exactly, including .jpg or .png)
-  photo: "assets/photos/ana-headshot.jpg", // already added for you
+  // ---------- PHOTOS ----------
+  // First photo should be the headshot — it shows by default.
+  // Add more photos to the array and visitors can click the arrow to see them.
+  // Put each photo file inside the assets/photos folder, then list its file name here.
+  photos: [
+    "assets/photos/ana-headshot.jpg" // headshot — shown first
+    // "assets/photos/ana-photo-2.jpg",
+    // "assets/photos/ana-photo-3.jpg"
+  ],
 
   // ---------- STATS ----------
   // Shown in the stat row under the hero. Edit the number any time.
@@ -115,4 +120,3 @@ const SITE_CONTENT = {
   ]
 
 };
-
