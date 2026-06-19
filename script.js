@@ -23,7 +23,7 @@ function render() {
   // Nav
   document.getElementById('nav-name').textContent = c.name;
   const navResume = document.getElementById('resume-link');
-  if (c.resume) { navResume.href = c.resume; checkFileExists(c.resume, [navResume]); } else { navResume.style.display = 'none'; }
+  if (c.resume) { navResume.href = c.resume; } else { navResume.style.display = 'none'; }
 
   // Hero
   document.getElementById('hero-eyebrow').textContent = `${c.tagline} — ${c.location}`;
@@ -33,7 +33,7 @@ function render() {
   document.getElementById('hero-email-link').href = `mailto:${c.email}`;
   document.getElementById('hero-linkedin-link').href = c.linkedin;
   const heroResume = document.getElementById('hero-resume-link');
-  if (c.resume) { heroResume.href = c.resume; checkFileExists(c.resume, [heroResume]); } else { heroResume.style.display = 'none'; }
+  if (c.resume) { heroResume.href = c.resume; } else { heroResume.style.display = 'none'; }
 
   // Stats row (auto-calculated from your content — no need to edit these numbers)
   const statRow = document.getElementById('stat-row');
@@ -47,7 +47,7 @@ function render() {
   ];
   stats.forEach(s => {
     statRow.appendChild(el(`
-      <div class="stat">
+      <div class="stat-badge">
         <div class="stat-num">${s.num}</div>
         <div class="stat-label">${s.label}</div>
       </div>
@@ -68,7 +68,7 @@ function render() {
     photoFrame.appendChild(img);
   };
   img.onerror = () => {
-    photoFrame.innerHTML = `<span style="color:var(--accent); font-size:13px; text-align:center; padding:16px;">Add your photo at<br><strong>${c.photo}</strong></span>`;
+    photoFrame.innerHTML = `<span class="photo-placeholder">Add your photo at<br><strong>${c.photo}</strong></span>`;
   };
   img.src = c.photo;
   img.alt = c.name;
