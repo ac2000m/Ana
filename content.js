@@ -44,6 +44,11 @@ const SITE_CONTENT = {
   // Shown in the stat row under the hero. Edit the number any time.
   clinicalHours: "0", // e.g. "120" — update as your clinical hours add up
 
+  // ---------- HERO INTRO ----------
+  // This shows at the top of the site, under your name. Keep it short —
+  // a quick, punchy version of who you are.
+  heroSub: "Doctor of Physical Therapy candidate passionate about helping people move and feel better.",
+
   // ---------- ABOUT ----------
   // This is your intro paragraph. Write it like you're
   // introducing yourself to someone in person.
