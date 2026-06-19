@@ -94,8 +94,23 @@ function renderForm() {
 
   root.appendChild(el(`
     <div class="admin-card">
+      <h2>Hero intro</h2>
+      <p class="note">The short paragraph at the top of the site, under your name.</p>
+      <div class="field"><label>Hero paragraph</label><textarea id="f-heroSub">${esc(working.heroSub)}</textarea></div>
+    </div>
+  `));
+
+  root.appendChild(el(`
+    <div class="admin-card">
       <h2>About</h2>
-      <div class="field"><label>Intro paragraph</label><textarea id="f-about">${esc(working.about)}</textarea></div>
+      <div class="field"><label>Intro paragraph (shown in "A little about me")</label><textarea id="f-about">${esc(working.about)}</textarea></div>
+    </div>
+  `));
+
+  root.appendChild(el(`
+    <div class="admin-card">
+      <h2>Stats</h2>
+      <div class="field"><label>Clinical hours</label><input id="f-clinicalHours" value="${esc(working.clinicalHours)}" placeholder="e.g. 120"></div>
     </div>
   `));
 
@@ -141,10 +156,17 @@ function renderForm() {
         <input type="file" id="cred-upload-input" accept=".pdf,image/*">
       </div>
       <div id="cred-upload-status" class="note" style="margin-top:8px; margin-bottom:0;"></div>
+      <button type="button" class="btn-soft" id="add-cred-no-file-btn" style="margin-top:14px;">+ Add a credential without a file</button>
     </div>
   `);
   root.appendChild(credCard);
   renderCredList();
+
+  document.getElementById('add-cred-no-file-btn').addEventListener('click', () => {
+    working.certifications = working.certifications || [];
+    working.certifications.push({ name: '', issuer: '', date: '', file: '' });
+    renderCredList();
+  });
 
   setupDropzone('cred-dropzone', 'cred-upload-input', async (file) => {
     const statusEl = document.getElementById('cred-upload-status');
@@ -176,7 +198,7 @@ function renderForm() {
   });
 
   // Wire up basic field listeners
-  ['name','tagline','location','email','phone','linkedin','about'].forEach(key => {
+  ['name','tagline','location','email','phone','linkedin','heroSub','about','clinicalHours'].forEach(key => {
     const node = document.getElementById('f-' + key);
     if (node) node.addEventListener('input', () => { working[key] = node.value; });
   });
@@ -220,12 +242,30 @@ function renderCredList() {
           <div class="field"><label>Date</label><input data-field="date" data-i="${i}" value="${esc(cred.date)}" placeholder="e.g. May 2025"></div>
         </div>
         <div class="field">
-          <label>File</label>
-          <a href="${esc(cred.file)}" target="_blank" rel="noopener" style="font-size:13.5px; color:var(--accent); font-weight:600; word-break:break-all;">${esc(cred.file)}</a>
+          <label>File ${cred.file ? '' : '(optional)'}</label>
+          ${cred.file
+            ? `<a href="${esc(cred.file)}" target="_blank" rel="noopener" style="font-size:13.5px; color:var(--accent); font-weight:600; word-break:break-all;">${esc(cred.file)}</a>`
+            : `<label class="btn-soft" for="cred-file-${i}" style="cursor:pointer; font-size:12.5px; padding:8px 16px;">+ Add a file later</label><input type="file" id="cred-file-${i}" data-add-file-i="${i}" accept=".pdf,image/*" style="display:none;">`
+          }
         </div>
       </div>
     `);
     list.appendChild(item);
+  });
+
+  list.querySelectorAll('[data-add-file-i]').forEach(input => {
+    input.addEventListener('change', async () => {
+      const file = input.files[0];
+      if (!file) return;
+      const i = Number(input.dataset.addFileI);
+      try {
+        const url = await uploadAssetFile(file, 'certifications');
+        working.certifications[i].file = url;
+        renderCredList();
+      } catch (err) {
+        alert('Upload failed: ' + (err && err.message ? err.message : String(err)));
+      }
+    });
   });
 
   list.querySelectorAll('input').forEach(input => {
