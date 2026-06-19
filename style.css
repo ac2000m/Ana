@@ -1,12 +1,12 @@
 :root {
-  --ink: #15191B;
-  --ink-soft: #4A5256;
-  --muted: #8A9296;
-  --bg: #FCFCFB;
-  --bg-raised: #FFFFFF;
-  --line: #E7E5E1;
-  --accent: #3E6E78;
-  --accent-soft: #EAF1F2;
+  --ink: #2A1A20;
+  --ink-soft: #6B4A54;
+  --muted: #B98C9A;
+  --bg: #FFFFFF;
+  --bg-raised: #FFF6F8;
+  --line: #F6DCE4;
+  --accent: #E0457B;
+  --accent-soft: #FCE4ED;
   --radius: 10px;
 }
 
@@ -137,6 +137,9 @@ h1.display {
 .btn-primary:hover { background: var(--accent); border-color: var(--accent); }
 .btn-ghost { background: transparent; color: var(--ink); border-color: var(--line); }
 .btn-ghost:hover { border-color: var(--ink); }
+
+/* Résumé buttons stay neutral (no pink accent) */
+#hero-resume-link:hover, .resume-link:hover { background: var(--ink); color: var(--bg); border-color: var(--ink); }
 
 /* ---------- Stat row ---------- */
 .stat-row {
