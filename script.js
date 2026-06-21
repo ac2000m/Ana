@@ -296,35 +296,63 @@ document.addEventListener('DOMContentLoaded', render);
   dropdown.querySelectorAll('a').forEach(a => a.addEventListener('click', close));
 })();
 
-// Short plasma-style trail following the cursor — overlapping glowing
-// blobs in shifting pink/magenta/purple hues, blended together
+// Boost-trail style cursor effect (canvas) — a smooth, tapering ribbon
+// that follows the mouse and fades quickly, like a Rocket League / Fortnite
+// vehicle trail, instead of stamped circles.
 (function () {
   if (window.matchMedia && window.matchMedia('(hover: none)').matches) return;
-  let lastSpawn = 0;
-  const SPAWN_INTERVAL = 10; // ms between blobs — dense enough to overlap into a streak
-  const DOT_LIFETIME = 160; // ms before a blob fully fades out
-  const HUES = ['#FF4FA0', '#E0457B', '#C04FE0', '#FF6FC4']; // pink → magenta → purple
+  const canvas = document.getElementById('trail-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+
+  const TRAIL_LIFETIME = 220; // ms — how long a point stays part of the trail (short trail)
+  const HUES = ['255,79,160', '224,69,123', '192,79,224', '255,111,196']; // pink → magenta → purple, as r,g,b
+
+  let points = []; // { x, y, time }
+  let dpr = window.devicePixelRatio || 1;
+
+  function resize() {
+    dpr = window.devicePixelRatio || 1;
+    canvas.width = window.innerWidth * dpr;
+    canvas.height = window.innerHeight * dpr;
+    canvas.style.width = window.innerWidth + 'px';
+    canvas.style.height = window.innerHeight + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  resize();
+  window.addEventListener('resize', resize);
 
   document.addEventListener('mousemove', (e) => {
-    const now = performance.now();
-    if (now - lastSpawn < SPAWN_INTERVAL) return;
-    lastSpawn = now;
-
-    const hue = HUES[Math.floor(Math.random() * HUES.length)];
-    const dot = document.createElement('div');
-    dot.className = 'cursor-dot';
-    dot.style.left = e.clientX + 'px';
-    dot.style.top = e.clientY + 'px';
-    dot.style.background = `radial-gradient(circle, ${hue} 0%, rgba(255,255,255,0) 75%)`;
-    dot.style.opacity = '0.85';
-    dot.style.transform = 'scale(1)';
-    document.body.appendChild(dot);
-    void dot.offsetWidth; // force a reflow so the fade-out actually transitions instead of skipping straight to hidden
-
-    requestAnimationFrame(() => {
-      dot.style.opacity = '0';
-      dot.style.transform = 'scale(1.6)';
-    });
-    setTimeout(() => dot.remove(), DOT_LIFETIME);
+    points.push({ x: e.clientX, y: e.clientY, time: performance.now() });
   });
+
+  function draw() {
+    const now = performance.now();
+    points = points.filter(p => now - p.time < TRAIL_LIFETIME);
+    ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+
+    if (points.length > 1) {
+      for (let i = 1; i < points.length; i++) {
+        const p0 = points[i - 1];
+        const p1 = points[i];
+        const age = (now - p1.time) / TRAIL_LIFETIME; // 0 = new, 1 = old
+        const t = i / points.length; // 0 = tail, 1 = head — controls taper
+        const width = Math.max(1, 14 * t * (1 - age * 0.3));
+        const alpha = Math.max(0, (1 - age) * 0.8 * t);
+        const hue = HUES[i % HUES.length];
+
+        ctx.beginPath();
+        ctx.moveTo(p0.x, p0.y);
+        ctx.lineTo(p1.x, p1.y);
+        ctx.lineCap = 'round';
+        ctx.lineWidth = width;
+        ctx.strokeStyle = `rgba(${hue},${alpha})`;
+        ctx.shadowColor = `rgba(${hue},${alpha})`;
+        ctx.shadowBlur = 10;
+        ctx.stroke();
+      }
+    }
+    requestAnimationFrame(draw);
+  }
+  requestAnimationFrame(draw);
 })();

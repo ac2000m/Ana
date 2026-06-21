@@ -62,24 +62,19 @@ body {
 .social-links svg { width: 18px; height: 18px; fill: currentColor; flex-shrink: 0; }
 
 /* ---------- Cursor plasma trail ---------- */
-.cursor-dot {
+/* ---------- Cursor plasma trail (canvas) ---------- */
+#trail-canvas {
   position: fixed;
   top: 0;
   left: 0;
-  width: 30px;
-  height: 30px;
-  margin-left: -15px;
-  margin-top: -15px;
-  border-radius: 50%;
+  width: 100vw;
+  height: 100vh;
   pointer-events: none;
   z-index: 9999;
   mix-blend-mode: multiply;
-  filter: blur(7px);
-  opacity: 0.85;
-  transition: opacity 0.16s ease, transform 0.16s ease;
 }
 @media (max-width: 760px), (hover: none) {
-  .cursor-dot { display: none; }
+  #trail-canvas { display: none; }
 }
 
 a { color: inherit; }
