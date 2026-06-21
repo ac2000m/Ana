@@ -1,0 +1,30 @@
+name: Sync preview to main
+
+# Whenever main changes, automatically make preview an exact copy of it.
+# This means: edit main -> preview updates itself, no manual merge needed.
+# (Going the other direction still requires a manual PR, since preview is
+# meant for testing changes before they're "official" on main.)
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  sync-preview:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Force preview to match main
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -B preview origin/main
+          git push --force origin preview
