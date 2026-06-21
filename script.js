@@ -200,6 +200,25 @@ async function render() {
     }
   });
 
+  safe('projects', () => {
+    const grid = document.getElementById('project-grid');
+    grid.innerHTML = '';
+    if (c.projects && c.projects.length) {
+      c.projects.forEach(p => {
+        grid.appendChild(el(`
+          <div class="project-card">
+            <div class="project-name">${p.name}</div>
+            ${p.tag ? `<div class="project-tag">${p.tag}</div>` : ''}
+            <p class="project-summary">${p.summary || ''}</p>
+            ${p.details ? `<p class="project-details">${p.details}</p>` : ''}
+          </div>
+        `));
+      });
+    } else {
+      grid.appendChild(el(`<p style="color:var(--muted)">No projects added yet.</p>`));
+    }
+  });
+
   safe('skills', () => {
     const skillsList = document.getElementById('skills-list');
     skillsList.innerHTML = '';
@@ -223,6 +242,24 @@ async function render() {
     document.getElementById('contact-linkedin').innerHTML = `<a href="${c.linkedin}" target="_blank" rel="noopener">Connect on LinkedIn →</a>`;
   });
 
+  safe('social links', () => {
+    const wrap = document.getElementById('social-links');
+    wrap.innerHTML = '';
+    const social = c.social || {};
+    const icons = {
+      linkedin: '<svg viewBox="0 0 24 24"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.02-3.04-1.85-3.04-1.86 0-2.14 1.45-2.14 2.94v5.67H9.36V9h3.41v1.56h.05c.47-.9 1.63-1.85 3.36-1.85 3.59 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.56V9h3.56v11.45z"/></svg>',
+      instagram: '<svg viewBox="0 0 24 24"><path d="M12 2.16c3.2 0 3.58.01 4.85.07 1.17.05 1.8.25 2.23.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.06.41 2.23.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.05 1.17-.25 1.8-.41 2.23-.22.56-.48.96-.9 1.38-.42.42-.82.68-1.38.9-.42.16-1.06.36-2.23.41-1.27.06-1.65.07-4.85.07s-3.58-.01-4.85-.07c-1.17-.05-1.8-.25-2.23-.41a3.72 3.72 0 0 1-1.38-.9 3.72 3.72 0 0 1-.9-1.38c-.16-.42-.36-1.06-.41-2.23-.06-1.27-.07-1.65-.07-4.85s.01-3.58.07-4.85c.05-1.17.25-1.8.41-2.23.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.42-.16 1.06-.36 2.23-.41 1.27-.06 1.65-.07 4.85-.07M12 0C8.74 0 8.33.01 7.05.07 5.78.13 4.9.33 4.14.63c-.79.31-1.46.72-2.13 1.39A5.9 5.9 0 0 0 .62 4.14c-.3.76-.5 1.64-.56 2.91C0 8.33 0 8.74 0 12s.01 3.67.07 4.95c.06 1.27.26 2.15.56 2.91.31.79.72 1.46 1.39 2.13a5.9 5.9 0 0 0 2.13 1.39c.76.3 1.64.5 2.91.56 1.28.06 1.69.07 4.95.07s3.67-.01 4.95-.07c1.27-.06 2.15-.26 2.91-.56a5.9 5.9 0 0 0 2.13-1.39 5.9 5.9 0 0 0 1.39-2.13c.3-.76.5-1.64.56-2.91.06-1.28.07-1.69.07-4.95s-.01-3.67-.07-4.95c-.06-1.27-.26-2.15-.56-2.91a5.9 5.9 0 0 0-1.39-2.13A5.9 5.9 0 0 0 19.86.63c-.76-.3-1.64-.5-2.91-.56C15.67.01 15.26 0 12 0zm0 5.84A6.16 6.16 0 1 0 12 18.16 6.16 6.16 0 0 0 12 5.84zm0 10.16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.41-10.4a1.44 1.44 0 1 1-2.88 0 1.44 1.44 0 0 1 2.88 0z"/></svg>',
+      facebook: '<svg viewBox="0 0 24 24"><path d="M22 12a10 10 0 1 0-11.56 9.88v-6.99H7.9V12h2.54V9.8c0-2.5 1.49-3.89 3.78-3.89 1.1 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56V12h2.78l-.44 2.89h-2.34v6.99A10 10 0 0 0 22 12z"/></svg>',
+      x: '<svg viewBox="0 0 24 24"><path d="M18.9 2H22l-7.6 8.7L23.3 22H16.7l-5.2-6.8L5.5 22H2.4l8.1-9.3L1.5 2h6.8l4.7 6.2L18.9 2zm-1.2 18h1.7L7.4 4H5.6l12.1 16z"/></svg>'
+    };
+    Object.keys(icons).forEach(key => {
+      const url = social[key];
+      if (url) {
+        wrap.appendChild(el(`<a href="${url}" target="_blank" rel="noopener" aria-label="${key}">${icons[key]}</a>`));
+      }
+    });
+  });
+
   safe('footer', () => {
     document.getElementById('footer-name').textContent = c.name;
     document.getElementById('footer-year').textContent = new Date().getFullYear();
@@ -241,18 +278,28 @@ function safe(label, fn) {
 
 document.addEventListener('DOMContentLoaded', render);
 
-// Cursor-following glow
+// Short pink trail of fading dots following the cursor
 (function () {
-  const glow = document.getElementById('cursor-glow');
-  if (!glow) return;
-  let raf = null;
+  if (window.matchMedia && window.matchMedia('(hover: none)').matches) return;
+  let lastSpawn = 0;
+  const SPAWN_INTERVAL = 35; // ms between dots — controls trail density
+  const DOT_LIFETIME = 450; // ms before a dot fully fades out
+
   document.addEventListener('mousemove', (e) => {
-    glow.classList.add('active');
-    if (raf) return;
-    raf = requestAnimationFrame(() => {
-      glow.style.transform = `translate(${e.clientX}px, ${e.clientY}px)`;
-      raf = null;
+    const now = performance.now();
+    if (now - lastSpawn < SPAWN_INTERVAL) return;
+    lastSpawn = now;
+
+    const dot = document.createElement('div');
+    dot.className = 'cursor-dot';
+    dot.style.left = e.clientX + 'px';
+    dot.style.top = e.clientY + 'px';
+    document.body.appendChild(dot);
+
+    requestAnimationFrame(() => {
+      dot.style.opacity = '0';
+      dot.style.transform = 'scale(0.3)';
     });
+    setTimeout(() => dot.remove(), DOT_LIFETIME);
   });
-  document.addEventListener('mouseleave', () => glow.classList.remove('active'));
 })();
