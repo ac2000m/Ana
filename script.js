@@ -322,8 +322,24 @@ document.addEventListener('DOMContentLoaded', render);
   resize();
   window.addEventListener('resize', resize);
 
+  let last = null;
   document.addEventListener('mousemove', (e) => {
-    points.push({ x: e.clientX, y: e.clientY, time: performance.now() });
+    const now = performance.now();
+    const pt = { x: e.clientX, y: e.clientY, time: now };
+    // Insert interpolated points along big jumps so fast mouse movement
+    // doesn't produce sparse, sharply-angled segments
+    if (last) {
+      const dx = pt.x - last.x;
+      const dy = pt.y - last.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      const steps = Math.min(20, Math.floor(dist / 6));
+      for (let s = 1; s < steps; s++) {
+        const f = s / steps;
+        points.push({ x: last.x + dx * f, y: last.y + dy * f, time: now });
+      }
+    }
+    points.push(pt);
+    last = pt;
   });
 
   function draw() {
@@ -331,10 +347,14 @@ document.addEventListener('DOMContentLoaded', render);
     points = points.filter(p => now - p.time < TRAIL_LIFETIME);
     ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
 
-    if (points.length > 1) {
-      for (let i = 1; i < points.length; i++) {
+    if (points.length > 2) {
+      for (let i = 1; i < points.length - 1; i++) {
         const p0 = points[i - 1];
         const p1 = points[i];
+        const p2 = points[i + 1];
+        const mid1 = { x: (p0.x + p1.x) / 2, y: (p0.y + p1.y) / 2 };
+        const mid2 = { x: (p1.x + p2.x) / 2, y: (p1.y + p2.y) / 2 };
+
         const age = (now - p1.time) / TRAIL_LIFETIME; // 0 = new, 1 = old
         const t = i / points.length; // 0 = tail, 1 = head — controls taper
         const width = Math.max(1, 14 * t * (1 - age * 0.3));
@@ -342,9 +362,10 @@ document.addEventListener('DOMContentLoaded', render);
         const hue = HUES[i % HUES.length];
 
         ctx.beginPath();
-        ctx.moveTo(p0.x, p0.y);
-        ctx.lineTo(p1.x, p1.y);
+        ctx.moveTo(mid1.x, mid1.y);
+        ctx.quadraticCurveTo(p1.x, p1.y, mid2.x, mid2.y);
         ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
         ctx.lineWidth = width;
         ctx.strokeStyle = `rgba(${hue},${alpha})`;
         ctx.shadowColor = `rgba(${hue},${alpha})`;
