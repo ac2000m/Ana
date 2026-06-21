@@ -41,8 +41,13 @@ const SITE_CONTENT = {
   ],
 
   // ---------- STATS ----------
-  // Shown in the stat row under the hero. Edit the number any time.
-  clinicalHours: "0", // e.g. "120" — update as your clinical hours add up
+  // Shown as badges under your name. Add, remove, or edit these from the
+  // Edit page (admin.html), or right here.
+  stats: [
+    { num: "0", label: "Clinical hours" },
+    { num: "2", label: "Certifications" },
+    { num: "1", label: "Languages spoken" }
+  ],
 
   // ---------- HERO INTRO ----------
   // This shows at the top of the site, under your name. Keep it short —
@@ -136,6 +141,30 @@ const SITE_CONTENT = {
     "Coaching",
     "Time Management",
     "Spanish (Bilingual)"
-  ]
+  ],
+
+  // ---------- PROJECTS ----------
+  // Research or projects you've worked on. "summary" is the short line
+  // always visible; "details" is the longer paragraph that appears when
+  // someone hovers the card. Best managed from the Edit page (admin.html).
+  projects: [
+    // Example — uncomment and fill in:
+    // {
+    //   name: "Concussion Recovery in Student Athletes",
+    //   tag: "Undergraduate research",
+    //   summary: "Looked at recovery timelines for student athletes.",
+    //   details: "A longer paragraph explaining the research question, methods, and what you found or learned."
+    // }
+  ],
+
+  // ---------- SOCIAL LINKS ----------
+  // Leave any of these blank to hide that icon. Only filled-in ones show.
+  // Best managed from the Edit page (admin.html).
+  social: {
+    linkedin: "",
+    instagram: "",
+    facebook: "",
+    x: ""
+  }
 
 };

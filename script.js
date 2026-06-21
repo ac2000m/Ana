@@ -94,11 +94,11 @@ async function render() {
   });
 
   safe('hero', () => {
-    document.getElementById('hero-eyebrow').textContent = `${c.tagline} — ${c.location}`;
     document.getElementById('hero-name').textContent = c.name;
     document.getElementById('hero-role').textContent = c.tagline;
     document.getElementById('hero-sub').textContent = c.heroSub || c.about;
-    document.getElementById('hero-email-link').href = `mailto:${c.email}`;
+    // "Get in touch" scrolls to the Contact section (mailto links often
+    // silently fail when there's no default mail app configured)
     document.getElementById('hero-linkedin-link').href = c.linkedin;
     const heroResume = document.getElementById('hero-resume-link');
     if (c.resume) { heroResume.href = c.resume; } else { heroResume.style.display = 'none'; }
@@ -107,12 +107,9 @@ async function render() {
   safe('stats', () => {
     const statRow = document.getElementById('stat-row');
     statRow.innerHTML = '';
-    const certCount = (c.certifications || []).length;
-    const langCount = (c.languages || []).length;
-    const stats = [
-      { num: c.clinicalHours || '0', label: 'Clinical hours' },
-      { num: certCount, label: 'Certifications' },
-      { num: langCount || 1, label: 'Languages spoken' }
+    const stats = (c.stats && c.stats.length) ? c.stats : [
+      { num: (c.certifications || []).length, label: 'Certifications' },
+      { num: (c.languages || []).length || 1, label: 'Languages spoken' }
     ];
     stats.forEach(s => {
       statRow.appendChild(el(`
@@ -278,27 +275,55 @@ function safe(label, fn) {
 
 document.addEventListener('DOMContentLoaded', render);
 
-// Short pink trail of fading dots following the cursor
+// Nav dropdown menu toggle
+(function () {
+  const btn = document.getElementById('nav-menu-btn');
+  const dropdown = document.getElementById('nav-dropdown');
+  if (!btn || !dropdown) return;
+
+  function close() {
+    dropdown.classList.remove('open');
+    btn.setAttribute('aria-expanded', 'false');
+  }
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isOpen = dropdown.classList.toggle('open');
+    btn.setAttribute('aria-expanded', String(isOpen));
+  });
+  document.addEventListener('click', (e) => {
+    if (!dropdown.contains(e.target) && e.target !== btn) close();
+  });
+  dropdown.querySelectorAll('a').forEach(a => a.addEventListener('click', close));
+})();
+
+// Short plasma-style trail following the cursor — overlapping glowing
+// blobs in shifting pink/magenta/purple hues, blended together
 (function () {
   if (window.matchMedia && window.matchMedia('(hover: none)').matches) return;
   let lastSpawn = 0;
-  const SPAWN_INTERVAL = 35; // ms between dots — controls trail density
-  const DOT_LIFETIME = 450; // ms before a dot fully fades out
+  const SPAWN_INTERVAL = 10; // ms between blobs — dense enough to overlap into a streak
+  const DOT_LIFETIME = 160; // ms before a blob fully fades out
+  const HUES = ['#FF4FA0', '#E0457B', '#C04FE0', '#FF6FC4']; // pink → magenta → purple
 
   document.addEventListener('mousemove', (e) => {
     const now = performance.now();
     if (now - lastSpawn < SPAWN_INTERVAL) return;
     lastSpawn = now;
 
+    const hue = HUES[Math.floor(Math.random() * HUES.length)];
     const dot = document.createElement('div');
     dot.className = 'cursor-dot';
     dot.style.left = e.clientX + 'px';
     dot.style.top = e.clientY + 'px';
+    dot.style.background = `radial-gradient(circle, ${hue} 0%, rgba(255,255,255,0) 75%)`;
+    dot.style.opacity = '0.85';
+    dot.style.transform = 'scale(1)';
     document.body.appendChild(dot);
+    void dot.offsetWidth; // force a reflow so the fade-out actually transitions instead of skipping straight to hidden
 
     requestAnimationFrame(() => {
       dot.style.opacity = '0';
-      dot.style.transform = 'scale(0.3)';
+      dot.style.transform = 'scale(1.6)';
     });
     setTimeout(() => dot.remove(), DOT_LIFETIME);
   });

@@ -107,12 +107,22 @@ function renderForm() {
     </div>
   `));
 
-  root.appendChild(el(`
+  const statsCard = el(`
     <div class="admin-card">
       <h2>Stats</h2>
-      <div class="field"><label>Clinical hours</label><input id="f-clinicalHours" value="${esc(working.clinicalHours)}" placeholder="e.g. 120"></div>
+      <p class="note">The small number badges under your name at the top of the site. Add, remove, or edit any of them.</p>
+      <div id="stats-list"></div>
+      <button type="button" class="btn-soft" id="add-stat-btn">+ Add a stat</button>
     </div>
-  `));
+  `);
+  root.appendChild(statsCard);
+  renderStatsList();
+
+  document.getElementById('add-stat-btn').addEventListener('click', () => {
+    working.stats = working.stats || [];
+    working.stats.push({ num: '0', label: '' });
+    renderStatsList();
+  });
 
   const photosCard = el(`
     <div class="admin-card">
@@ -184,6 +194,104 @@ function renderForm() {
     }
   });
 
+  const eduCard = el(`
+    <div class="admin-card">
+      <h2>Education</h2>
+      <p class="note">Shows in "Where I've been," alongside your experience, in order.</p>
+      <div id="edu-list"></div>
+      <button type="button" class="btn-soft" id="add-edu-btn">+ Add education</button>
+    </div>
+  `);
+  root.appendChild(eduCard);
+  renderEduList();
+
+  document.getElementById('add-edu-btn').addEventListener('click', () => {
+    working.education = working.education || [];
+    working.education.push({ degree: '', school: '', years: '', details: '' });
+    renderEduList();
+  });
+
+  const expCard = el(`
+    <div class="admin-card">
+      <h2>Experience</h2>
+      <p class="note">Jobs, internships, clinical hours, volunteer work — shows in "Where I've been."</p>
+      <div id="exp-list"></div>
+      <button type="button" class="btn-soft" id="add-exp-btn">+ Add experience</button>
+    </div>
+  `);
+  root.appendChild(expCard);
+  renderExpList();
+
+  document.getElementById('add-exp-btn').addEventListener('click', () => {
+    working.experience = working.experience || [];
+    working.experience.push({ title: '', organization: '', years: '', details: '' });
+    renderExpList();
+  });
+
+  const skillsCard = el(`
+    <div class="admin-card">
+      <h2>What I bring (skills)</h2>
+      <p class="note">A simple list of skills — one per line.</p>
+      <textarea id="f-skills" style="min-height:120px;">${esc((working.skills || []).join('\n'))}</textarea>
+    </div>
+  `);
+  root.appendChild(skillsCard);
+  document.getElementById('f-skills').addEventListener('input', (e) => {
+    working.skills = e.target.value.split('\n').map(s => s.trim()).filter(Boolean);
+  });
+
+  const langCard = el(`
+    <div class="admin-card">
+      <h2>Languages</h2>
+      <div id="lang-list"></div>
+      <button type="button" class="btn-soft" id="add-lang-btn">+ Add a language</button>
+    </div>
+  `);
+  root.appendChild(langCard);
+  renderLangList();
+
+  document.getElementById('add-lang-btn').addEventListener('click', () => {
+    working.languages = working.languages || [];
+    working.languages.push({ name: '', level: '' });
+    renderLangList();
+  });
+
+  const projectsCard = el(`
+    <div class="admin-card">
+      <h2>My projects</h2>
+      <p class="note">Research or projects you've worked on. "Short summary" always shows; "Full details" appears when a visitor hovers the card.</p>
+      <div id="project-list"></div>
+      <button type="button" class="btn-soft" id="add-project-btn">+ Add a project</button>
+    </div>
+  `);
+  root.appendChild(projectsCard);
+  renderProjectList();
+
+  document.getElementById('add-project-btn').addEventListener('click', () => {
+    working.projects = working.projects || [];
+    working.projects.push({ name: '', tag: '', summary: '', details: '' });
+    renderProjectList();
+  });
+
+  const socialCard = el(`
+    <div class="admin-card">
+      <h2>Social links</h2>
+      <p class="note">Leave any of these blank to hide that icon at the bottom of your site. Only filled-in ones show.</p>
+      <div class="field"><label>LinkedIn</label><input id="f-social-linkedin" value="${esc((working.social || {}).linkedin)}" placeholder="https://linkedin.com/in/..."></div>
+      <div class="field"><label>Instagram</label><input id="f-social-instagram" value="${esc((working.social || {}).instagram)}" placeholder="https://instagram.com/..."></div>
+      <div class="field"><label>Facebook</label><input id="f-social-facebook" value="${esc((working.social || {}).facebook)}" placeholder="https://facebook.com/..."></div>
+      <div class="field"><label>X (Twitter)</label><input id="f-social-x" value="${esc((working.social || {}).x)}" placeholder="https://x.com/..."></div>
+    </div>
+  `);
+  root.appendChild(socialCard);
+  ['linkedin', 'instagram', 'facebook', 'x'].forEach(key => {
+    const node = document.getElementById('f-social-' + key);
+    node.addEventListener('input', () => {
+      working.social = working.social || {};
+      working.social[key] = node.value;
+    });
+  });
+
   setupDropzone('resume-dropzone', 'resume-upload-input', async (file) => {
     const statusEl = document.getElementById('resume-upload-status');
     statusEl.textContent = 'Uploading…';
@@ -198,7 +306,7 @@ function renderForm() {
   });
 
   // Wire up basic field listeners
-  ['name','tagline','location','email','phone','linkedin','heroSub','about','clinicalHours'].forEach(key => {
+  ['name','tagline','location','email','phone','linkedin','heroSub','about'].forEach(key => {
     const node = document.getElementById('f-' + key);
     if (node) node.addEventListener('input', () => { working[key] = node.value; });
   });
@@ -225,6 +333,153 @@ function renderPhotoList() {
       const i = Number(btn.dataset.i);
       working.photos.splice(i, 1);
       renderPhotoList();
+    });
+  });
+}
+
+function renderStatsList() {
+  const list = document.getElementById('stats-list');
+  list.innerHTML = '';
+  (working.stats || []).forEach((s, i) => {
+    const item = el(`
+      <div class="cred-item" style="display:flex; gap:14px; align-items:flex-end;">
+        <div class="field" style="flex:0 0 100px; margin-bottom:0;"><label>Number</label><input data-sfield="num" data-i="${i}" value="${esc(s.num)}" placeholder="0"></div>
+        <div class="field" style="flex:1; margin-bottom:0;"><label>Label</label><input data-sfield="label" data-i="${i}" value="${esc(s.label)}" placeholder="e.g. Clinical hours"></div>
+        <button type="button" class="remove-btn" data-i="${i}" style="position:static; padding-bottom:11px;">Remove ✕</button>
+      </div>
+    `);
+    list.appendChild(item);
+  });
+  list.querySelectorAll('[data-sfield]').forEach(input => {
+    input.addEventListener('input', () => {
+      const i = Number(input.dataset.i);
+      working.stats[i][input.dataset.sfield] = input.value;
+    });
+  });
+  list.querySelectorAll('.remove-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      working.stats.splice(Number(btn.dataset.i), 1);
+      renderStatsList();
+    });
+  });
+}
+
+function renderEduList() {
+  const list = document.getElementById('edu-list');
+  list.innerHTML = '';
+  (working.education || []).forEach((e, i) => {
+    const item = el(`
+      <div class="cred-item">
+        <button type="button" class="remove-btn" data-i="${i}">Remove ✕</button>
+        <div class="field"><label>Degree / program</label><input data-efield="degree" data-i="${i}" value="${esc(e.degree)}" placeholder="e.g. Doctor of Physical Therapy (DPT)"></div>
+        <div class="row2">
+          <div class="field"><label>School</label><input data-efield="school" data-i="${i}" value="${esc(e.school)}" placeholder="e.g. University of Illinois Chicago"></div>
+          <div class="field"><label>Years</label><input data-efield="years" data-i="${i}" value="${esc(e.years)}" placeholder="e.g. 2024–2027"></div>
+        </div>
+        <div class="field"><label>Details (optional)</label><input data-efield="details" data-i="${i}" value="${esc(e.details)}" placeholder="A short note about this"></div>
+      </div>
+    `);
+    list.appendChild(item);
+  });
+  list.querySelectorAll('[data-efield]').forEach(input => {
+    input.addEventListener('input', () => {
+      const i = Number(input.dataset.i);
+      working.education[i][input.dataset.efield] = input.value;
+    });
+  });
+  list.querySelectorAll('.remove-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      working.education.splice(Number(btn.dataset.i), 1);
+      renderEduList();
+    });
+  });
+}
+
+function renderExpList() {
+  const list = document.getElementById('exp-list');
+  list.innerHTML = '';
+  (working.experience || []).forEach((x, i) => {
+    const item = el(`
+      <div class="cred-item">
+        <button type="button" class="remove-btn" data-i="${i}">Remove ✕</button>
+        <div class="field"><label>Title / role</label><input data-xfield="title" data-i="${i}" value="${esc(x.title)}" placeholder="e.g. Physical Therapy Aide"></div>
+        <div class="row2">
+          <div class="field"><label>Organization</label><input data-xfield="organization" data-i="${i}" value="${esc(x.organization)}" placeholder="e.g. Dubuque Physical Therapy"></div>
+          <div class="field"><label>Years</label><input data-xfield="years" data-i="${i}" value="${esc(x.years)}" placeholder="e.g. 2022–2023"></div>
+        </div>
+        <div class="field"><label>Details (optional)</label><input data-xfield="details" data-i="${i}" value="${esc(x.details)}" placeholder="A short note about this"></div>
+      </div>
+    `);
+    list.appendChild(item);
+  });
+  list.querySelectorAll('[data-xfield]').forEach(input => {
+    input.addEventListener('input', () => {
+      const i = Number(input.dataset.i);
+      working.experience[i][input.dataset.xfield] = input.value;
+    });
+  });
+  list.querySelectorAll('.remove-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      working.experience.splice(Number(btn.dataset.i), 1);
+      renderExpList();
+    });
+  });
+}
+
+function renderLangList() {
+  const list = document.getElementById('lang-list');
+  list.innerHTML = '';
+  (working.languages || []).forEach((l, i) => {
+    const item = el(`
+      <div class="cred-item" style="display:flex; gap:14px; align-items:flex-end;">
+        <div class="field" style="flex:1; margin-bottom:0;"><label>Language</label><input data-lfield="name" data-i="${i}" value="${esc(l.name)}" placeholder="e.g. Spanish"></div>
+        <div class="field" style="flex:1; margin-bottom:0;"><label>Level</label><input data-lfield="level" data-i="${i}" value="${esc(l.level)}" placeholder="e.g. Native or bilingual proficiency"></div>
+        <button type="button" class="remove-btn" data-i="${i}" style="position:static; padding-bottom:11px;">Remove ✕</button>
+      </div>
+    `);
+    list.appendChild(item);
+  });
+  list.querySelectorAll('[data-lfield]').forEach(input => {
+    input.addEventListener('input', () => {
+      const i = Number(input.dataset.i);
+      working.languages[i][input.dataset.lfield] = input.value;
+    });
+  });
+  list.querySelectorAll('.remove-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      working.languages.splice(Number(btn.dataset.i), 1);
+      renderLangList();
+    });
+  });
+}
+
+function renderProjectList() {
+  const list = document.getElementById('project-list');
+  list.innerHTML = '';
+  (working.projects || []).forEach((p, i) => {
+    const item = el(`
+      <div class="cred-item">
+        <button type="button" class="remove-btn" data-i="${i}">Remove ✕</button>
+        <div class="field"><label>Project name</label><input data-pfield="name" data-i="${i}" value="${esc(p.name)}" placeholder="e.g. Concussion Recovery in Student Athletes"></div>
+        <div class="field"><label>Tag (optional)</label><input data-pfield="tag" data-i="${i}" value="${esc(p.tag)}" placeholder="e.g. Undergraduate research"></div>
+        <div class="field"><label>Short summary (always visible)</label><input data-pfield="summary" data-i="${i}" value="${esc(p.summary)}" placeholder="One sentence shown on the card"></div>
+        <div class="field"><label>Full details (shown on hover)</label><textarea data-pfield="details" data-i="${i}" placeholder="A longer paragraph about this project">${esc(p.details)}</textarea></div>
+      </div>
+    `);
+    list.appendChild(item);
+  });
+  list.querySelectorAll('[data-pfield]').forEach(input => {
+    input.addEventListener('input', () => {
+      const i = Number(input.dataset.i);
+      const field = input.dataset.pfield;
+      working.projects[i][field] = input.value;
+    });
+  });
+  list.querySelectorAll('.remove-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const i = Number(btn.dataset.i);
+      working.projects.splice(i, 1);
+      renderProjectList();
     });
   });
 }
