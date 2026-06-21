@@ -7,25 +7,36 @@
 <meta name="description" content="Ana Chandlee — Doctor of Physical Therapy Candidate at UIC, Chicago.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Caveat:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div id="cursor-glow"></div>
+<div class="bg-deco bg-deco--1"></div>
+<div class="bg-deco bg-deco--2"></div>
+<div class="bg-deco bg-deco--3"></div>
+<div class="bg-deco bg-deco--4"></div>
 
 <nav>
   <div class="wrap">
     <a href="#top" class="nav-name" id="nav-name">Ana Chandlee</a>
     <div class="links">
-      <a href="#profile">Profile</a>
-      <a href="#track-record">Experience</a>
-      <a href="#certifications">Certifications</a>
-      <a href="#contact">Contact</a>
       <a class="resume-link" id="resume-link" href="#" target="_blank" rel="noopener">Résumé</a>
+      <a href="#contact" class="nav-contact-btn">Contact</a>
+      <button type="button" class="nav-menu-btn" id="nav-menu-btn" aria-label="Open menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="nav-dropdown" id="nav-dropdown">
+        <a href="#profile">Profile</a>
+        <a href="#track-record">Experience</a>
+        <a href="#projects">Projects</a>
+        <a href="#certifications">Certifications</a>
+      </div>
     </div>
   </div>
 </nav>
+
+<a href="#contact" class="floating-contact-btn">Contact me</a>
 
 <header class="hero" id="top">
   <div class="wrap hero-grid">
@@ -37,7 +48,7 @@
       <p class="hero-role" id="hero-role"></p>
       <p class="hero-sub" id="hero-sub"></p>
       <div class="hero-actions">
-        <a class="btn btn-primary" id="hero-email-link" href="#">Get in touch</a>
+        <a class="btn btn-primary" id="hero-email-link" href="#contact">Get in touch</a>
         <a class="btn btn-ghost" id="hero-linkedin-link" href="#" target="_blank" rel="noopener">View LinkedIn</a>
         <a class="btn btn-ghost" id="hero-resume-link" href="#" target="_blank" rel="noopener">Résumé</a>
       </div>
@@ -90,6 +101,16 @@
   </div>
 </section>
 
+<section id="projects">
+  <div class="wrap">
+    <div class="section-head">
+      <h2 class="section-title">My projects</h2>
+      <p class="section-desc">Research and projects I've worked on — hover a card to read more.</p>
+    </div>
+    <div class="project-grid" id="project-grid"></div>
+  </div>
+</section>
+
 
 <section id="skills-languages">
   <div class="wrap">
@@ -126,6 +147,7 @@
 </section>
 
 <footer>
+  <div class="social-links" id="social-links"></div>
   © <span id="footer-year"></span> <span id="footer-name"></span>
   <div style="margin-top:10px;">
     <a href="admin.html" style="display:inline-flex; align-items:center; gap:6px; padding:8px 18px; border-radius:100px; border:1px solid var(--line); color:var(--ink-soft); text-decoration:none; font-size:13px; font-weight:600;">Admin login</a>
