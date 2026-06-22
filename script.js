@@ -1,200 +1,109 @@
-// This file builds the page using the text in content.js.
-// You shouldn't need to edit this — just edit content.js.
-
 function el(html) {
   const t = document.createElement('template');
   t.innerHTML = html.trim();
   return t.content.firstElementChild;
 }
-
-// Hides one or more elements if the file they link to hasn't been
-// uploaded yet (so buttons don't 404 before you've added your files).
-function checkFileExists(url, elements) {
-  fetch(url, { method: 'HEAD' })
-    .then(res => { if (!res.ok) elements.forEach(e => e.style.display = 'none'); })
-    .catch(() => elements.forEach(e => e.style.display = 'none'));
+function safe(label, fn) {
+  try { fn(); } catch (err) { console.error(`"${label}":`, err); }
 }
-
-// Renders the hero photo. First photo is the headshot and shows by default.
-// Photos never auto-advance — only the arrows/dots change which one shows.
-function renderPhotoCarousel(c) {
-  const photos = (c.photos && c.photos.length) ? c.photos : (c.photo ? [c.photo] : []);
-  const frame = document.getElementById('photo-frame');
-  const prevBtn = document.getElementById('photo-prev');
-  const nextBtn = document.getElementById('photo-next');
-  const dotsWrap = document.getElementById('photo-dots');
-  if (!frame) return;
-
-  if (!photos.length) {
-    frame.innerHTML = `<span class="photo-placeholder">Add a photo at<br><strong>assets/photos/</strong></span>`;
-    if (prevBtn) prevBtn.hidden = true;
-    if (nextBtn) nextBtn.hidden = true;
-    return;
-  }
-
-  let index = 0;
-
-  function showPhoto(i) {
-    index = (i + photos.length) % photos.length;
-    frame.innerHTML = '';
-    const img = new Image();
-    img.alt = c.name;
-    img.onerror = () => {
-      frame.innerHTML = `<span class="photo-placeholder">Add your photo at<br><strong>${photos[index]}</strong></span>`;
-    };
-    img.src = photos[index];
-    frame.appendChild(img);
-
-    if (dotsWrap) {
-      dotsWrap.innerHTML = '';
-      if (photos.length > 1) {
-        photos.forEach((_, i2) => {
-          const dot = el(`<button type="button" class="photo-dot${i2 === index ? ' active' : ''}" aria-label="Show photo ${i2 + 1}"></button>`);
-          dot.addEventListener('click', () => showPhoto(i2));
-          dotsWrap.appendChild(dot);
-        });
-      }
-    }
-  }
-
-  // Only one photo: hide arrows entirely, photo never changes.
-  const multi = photos.length > 1;
-  if (prevBtn) prevBtn.hidden = !multi;
-  if (nextBtn) nextBtn.hidden = !multi;
-  if (multi) {
-    prevBtn.onclick = () => showPhoto(index - 1);
-    nextBtn.onclick = () => showPhoto(index + 1);
-  }
-
-  showPhoto(0); // headshot first, no auto-advance
-}
-
-// Picks up any saved edits from Supabase (made via the Edit page).
-// Falls back to the defaults in content.js if nothing's been saved,
-// or if Supabase isn't reachable.
 async function getSavedOverrides() {
-  try {
-    const saved = await fetchSiteContentRow();
-    return saved || {};
-  } catch (e) {
-    return {};
-  }
+  try { return (await fetchSiteContentRow()) || {}; } catch { return {}; }
 }
 
 async function render() {
   const overrides = await getSavedOverrides();
   const c = Object.assign({}, SITE_CONTENT, overrides);
-
-  document.title = `${c.name} — ${c.tagline}`;
+  document.title = c.name;
 
   safe('nav', () => {
-    document.getElementById('nav-name').textContent = c.name;
-    const navResume = document.getElementById('resume-link');
-    if (c.resume) { navResume.href = c.resume; } else { navResume.style.display = 'none'; }
+    document.getElementById('nav-name').textContent = c.name.split(' ').map(w => w[0]).join('');
+    const rl = document.getElementById('resume-link');
+    const mrl = document.getElementById('mobile-resume-link');
+    if (c.resume) { rl.href = c.resume; if (mrl) mrl.href = c.resume; }
+    else { rl.style.display = 'none'; if (mrl) mrl.style.display = 'none'; }
   });
 
   safe('hero', () => {
     document.getElementById('hero-name').textContent = c.name;
     document.getElementById('hero-role').textContent = c.tagline;
     document.getElementById('hero-sub').textContent = c.heroSub || c.about;
-    // "Get in touch" scrolls to the Contact section (mailto links often
-    // silently fail when there's no default mail app configured)
-    document.getElementById('hero-linkedin-link').href = c.linkedin;
-    const heroResume = document.getElementById('hero-resume-link');
-    if (c.resume) { heroResume.href = c.resume; } else { heroResume.style.display = 'none'; }
+    const linkedinUrl = (c.social && c.social.linkedin) || c.linkedin;
+    const hl = document.getElementById('hero-linkedin-link');
+    if (linkedinUrl) { hl.href = linkedinUrl; } else { hl.style.display = 'none'; }
   });
 
+  safe('photo', () => renderPhotoCarousel(c));
+
   safe('stats', () => {
-    const statRow = document.getElementById('stat-row');
-    statRow.innerHTML = '';
+    const row = document.getElementById('stat-row');
+    row.innerHTML = '';
     const stats = (c.stats && c.stats.length) ? c.stats : [
       { num: (c.certifications || []).length, label: 'Certifications' },
-      { num: (c.languages || []).length || 1, label: 'Languages spoken' }
+      { num: (c.languages || []).length || 1, label: 'Languages' }
     ];
     stats.forEach(s => {
-      statRow.appendChild(el(`
-        <div class="stat-badge">
-          <div class="stat-num">${s.num}</div>
-          <div class="stat-label">${s.label}</div>
-        </div>
-      `));
+      row.appendChild(el(`<div class="stat-item"><span class="stat-num">${s.num}</span><span class="stat-label">${s.label}</span></div>`));
     });
   });
 
   safe('about', () => {
     document.getElementById('about-text').textContent = c.about;
+    const linkedinUrl = (c.social && c.social.linkedin) || c.linkedin;
+    const ll = document.getElementById('about-linkedin-link');
+    if (linkedinUrl) { ll.href = linkedinUrl; } else { ll.style.display = 'none'; }
   });
 
-  safe('photo carousel', () => {
-    renderPhotoCarousel(c);
-  });
-
-  safe('info list', () => {
-    const infoList = document.getElementById('info-list');
-    infoList.innerHTML = '';
-    const currentEdu = (c.education && c.education[0]) || {};
-    const info = [
+  safe('info chips', () => {
+    const wrap = document.getElementById('info-list');
+    wrap.innerHTML = '';
+    const edu0 = (c.education && c.education[0]) || {};
+    [
       { label: 'Location', value: c.location },
-      { label: 'Currently', value: currentEdu.degree || '' },
-      { label: 'At', value: currentEdu.school || '' },
+      { label: 'Currently', value: edu0.degree || '' },
+      { label: 'At', value: edu0.school || '' },
       { label: 'Undergrad', value: (c.education && c.education[1] && c.education[1].school) || '' }
-    ];
-    info.forEach(i => {
+    ].forEach(i => {
       if (!i.value) return;
-      infoList.appendChild(el(`
-        <div class="info-item">
-          <div class="info-label">${i.label}</div>
-          <div class="info-value">${i.value}</div>
-        </div>
-      `));
+      wrap.appendChild(el(`<span class="info-chip"><strong>${i.label}</strong>${i.value}</span>`));
     });
   });
 
-  safe('track record', () => {
-    const rail = document.getElementById('zigzag-rail');
-    rail.innerHTML = '';
+  safe('experience', () => {
+    const list = document.getElementById('zigzag-rail');
+    list.innerHTML = '';
     const items = []
-      .concat((c.education || []).map(e => ({ kind: 'edu', years: e.years, title: e.degree, org: e.school, details: e.details })))
-      .concat((c.experience || []).map(x => ({ kind: 'exp', years: x.years, title: x.title, org: x.organization, details: x.details })));
-
-    items.forEach((item, i) => {
-      const side = i % 2 === 0 ? 'left' : 'right';
-      const icon = item.kind === 'edu' ? '🎓' : '💼';
-      rail.appendChild(el(`
-        <div class="zigzag-item zigzag-item--${side}">
-          <div class="zigzag-icon">${icon}</div>
-          <div class="zigzag-card">
-            <div class="zigzag-years">${item.years || ''}</div>
-            <h3 class="track-title">${item.title}</h3>
-            <p class="track-org">${item.org}</p>
-            ${item.details ? `<p class="track-details">${item.details}</p>` : ''}
+      .concat((c.education || []).map(e => ({ years: e.years, title: e.degree, org: e.school, detail: e.details, logo: e.logo })))
+      .concat((c.experience || []).map(x => ({ years: x.years, title: x.title, org: x.organization, detail: x.details, logo: x.logo })));
+    items.forEach(item => {
+      list.appendChild(el(`
+        <li class="exp-item reveal">
+          <div class="exp-left">
+            <div class="exp-year">${item.years || ''}</div>
+            ${item.logo ? `<img class="exp-logo" src="${item.logo}" alt="${item.org || ''}" loading="lazy">` : ''}
           </div>
+          <div class="exp-content">
+            <div class="exp-title">${item.title || ''}</div>
+            <div class="exp-org">${item.org || ''}</div>
+            ${item.detail ? `<div class="exp-detail">${item.detail}</div>` : ''}
+          </div>
+        </li>
+      `));
+    });
+    attachReveal();
+  });
+
+  safe('certs', () => {
+    const grid = document.getElementById('cert-grid');
+    grid.innerHTML = '';
+    (c.certifications || []).forEach(cert => {
+      grid.appendChild(el(`
+        <div class="cert-card">
+          <div class="cert-name">${cert.name}</div>
+          <div class="cert-meta">${cert.issuer}${cert.date ? ' · ' + cert.date : ''}</div>
+          ${cert.file ? `<a class="cert-link" href="${cert.file}" target="_blank" rel="noopener">View document →</a>` : ''}
         </div>
       `));
     });
-  });
-
-  safe('certifications', () => {
-    const certGrid = document.getElementById('cert-grid');
-    certGrid.innerHTML = '';
-    if (c.certifications && c.certifications.length) {
-      c.certifications.forEach(cert => {
-        certGrid.appendChild(el(`
-          <div class="cert-card">
-            <div class="cert-name">${cert.name}</div>
-            <div class="cert-meta">${cert.issuer}${cert.date ? ' · ' + cert.date : ''}</div>
-            ${cert.file ? `<a class="cert-link" href="${cert.file}" target="_blank" rel="noopener" data-cert-check>View document →</a>` : ''}
-          </div>
-        `));
-      });
-      certGrid.querySelectorAll('[data-cert-check]').forEach(link => {
-        fetch(link.href, { method: 'HEAD' })
-          .then(res => { if (!res.ok) link.replaceWith(el(`<span class="cert-link" style="opacity:.5; cursor:default;">File coming soon</span>`)); })
-          .catch(() => { link.replaceWith(el(`<span class="cert-link" style="opacity:.5; cursor:default;">File coming soon</span>`)); });
-      });
-    } else {
-      certGrid.appendChild(el(`<p style="color:var(--muted)">No certifications added yet.</p>`));
-    }
   });
 
   safe('projects', () => {
@@ -208,108 +117,114 @@ async function render() {
             ${p.tag ? `<div class="project-tag">${p.tag}</div>` : ''}
             <p class="project-summary">${p.summary || ''}</p>
             ${p.details ? `<p class="project-details">${p.details}</p>` : ''}
+            ${p.link || p.file ? `<div class="project-links">
+              ${p.link ? `<a class="project-link" href="${p.link}" target="_blank" rel="noopener">View project →</a>` : ''}
+              ${p.file ? `<a class="project-link" href="${p.file}" target="_blank" rel="noopener">Download file →</a>` : ''}
+            </div>` : ''}
           </div>
         `));
       });
-    } else {
-      grid.appendChild(el(`<p style="color:var(--muted)">No projects added yet.</p>`));
     }
   });
 
   safe('skills', () => {
-    const skillsList = document.getElementById('skills-list');
-    skillsList.innerHTML = '';
-    (c.skills || []).forEach(s => {
-      skillsList.appendChild(el(`<span class="pill">${s}</span>`));
-    });
-  });
-
-  safe('languages', () => {
-    const langList = document.getElementById('languages-list');
-    langList.innerHTML = '';
-    (c.languages || []).forEach(l => {
-      langList.appendChild(el(`<span class="pill">${l.name} — ${l.level}</span>`));
-    });
+    ['skills-list', 'languages-list'].forEach(id => document.getElementById(id).innerHTML = '');
+    (c.skills || []).forEach(s => document.getElementById('skills-list').appendChild(el(`<span class="tag">${s}</span>`)));
+    (c.languages || []).forEach(l => document.getElementById('languages-list').appendChild(el(`<span class="tag">${l.name}${l.level ? ' — ' + l.level : ''}</span>`)));
   });
 
   safe('contact', () => {
-    document.getElementById('contact-email').innerHTML = `<a href="mailto:${c.email}">${c.email}</a>`;
-    document.getElementById('contact-phone').textContent = c.phone;
-    document.getElementById('contact-location').textContent = c.location;
-    document.getElementById('contact-linkedin').innerHTML = `<a href="${c.linkedin}" target="_blank" rel="noopener">Connect on LinkedIn →</a>`;
+    document.getElementById('contact-email').innerHTML = c.email ? `<a href="mailto:${c.email}">${c.email}</a>` : '';
+    document.getElementById('contact-phone').textContent = c.phone || '';
+    document.getElementById('contact-location').textContent = c.location || '';
+    const lu = (c.social && c.social.linkedin) || c.linkedin;
+    document.getElementById('contact-linkedin').innerHTML = lu ? `<a href="${lu}" target="_blank" rel="noopener">LinkedIn ↗</a>` : '';
   });
 
-  safe('social links', () => {
+  safe('social', () => {
     const wrap = document.getElementById('social-links');
     wrap.innerHTML = '';
     const social = c.social || {};
     const icons = {
       linkedin: '<svg viewBox="0 0 24 24"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.02-3.04-1.85-3.04-1.86 0-2.14 1.45-2.14 2.94v5.67H9.36V9h3.41v1.56h.05c.47-.9 1.63-1.85 3.36-1.85 3.59 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.56V9h3.56v11.45z"/></svg>',
-      instagram: '<svg viewBox="0 0 24 24"><path d="M12 2.16c3.2 0 3.58.01 4.85.07 1.17.05 1.8.25 2.23.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.06.41 2.23.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.05 1.17-.25 1.8-.41 2.23-.22.56-.48.96-.9 1.38-.42.42-.82.68-1.38.9-.42.16-1.06.36-2.23.41-1.27.06-1.65.07-4.85.07s-3.58-.01-4.85-.07c-1.17-.05-1.8-.25-2.23-.41a3.72 3.72 0 0 1-1.38-.9 3.72 3.72 0 0 1-.9-1.38c-.16-.42-.36-1.06-.41-2.23-.06-1.27-.07-1.65-.07-4.85s.01-3.58.07-4.85c.05-1.17.25-1.8.41-2.23.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.42-.16 1.06-.36 2.23-.41 1.27-.06 1.65-.07 4.85-.07M12 0C8.74 0 8.33.01 7.05.07 5.78.13 4.9.33 4.14.63c-.79.31-1.46.72-2.13 1.39A5.9 5.9 0 0 0 .62 4.14c-.3.76-.5 1.64-.56 2.91C0 8.33 0 8.74 0 12s.01 3.67.07 4.95c.06 1.27.26 2.15.56 2.91.31.79.72 1.46 1.39 2.13a5.9 5.9 0 0 0 2.13 1.39c.76.3 1.64.5 2.91.56 1.28.06 1.69.07 4.95.07s3.67-.01 4.95-.07c1.27-.06 2.15-.26 2.91-.56a5.9 5.9 0 0 0 2.13-1.39 5.9 5.9 0 0 0 1.39-2.13c.3-.76.5-1.64.56-2.91.06-1.28.07-1.69.07-4.95s-.01-3.67-.07-4.95c-.06-1.27-.26-2.15-.56-2.91a5.9 5.9 0 0 0-1.39-2.13A5.9 5.9 0 0 0 19.86.63c-.76-.3-1.64-.5-2.91-.56C15.67.01 15.26 0 12 0zm0 5.84A6.16 6.16 0 1 0 12 18.16 6.16 6.16 0 0 0 12 5.84zm0 10.16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.41-10.4a1.44 1.44 0 1 1-2.88 0 1.44 1.44 0 0 1 2.88 0z"/></svg>',
+      instagram: '<svg viewBox="0 0 24 24"><path d="M12 2.16c3.2 0 3.58.01 4.85.07 1.17.05 1.8.25 2.23.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.06.41 2.23.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.05 1.17-.25 1.8-.41 2.23-.22.56-.48.96-.9 1.38-.42.42-.82.68-1.38.9-.42.16-1.06.36-2.23.41-1.27.06-1.65.07-4.85.07s-3.58-.01-4.85-.07c-1.17-.05-1.8-.25-2.23-.41a3.72 3.72 0 0 1-1.38-.9 3.72 3.72 0 0 1-.9-1.38c-.16-.42-.36-1.06-.41-2.23-.06-1.27-.07-1.65-.07-4.85s.01-3.58.07-4.85c.05-1.17.25-1.8.41-2.23.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.42-.16 1.06-.36 2.23-.41 1.27-.06 1.65-.07 4.85-.07zm0 5.84A6.16 6.16 0 1 0 12 18.16 6.16 6.16 0 0 0 12 5.84zm0 10.16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.41-10.4a1.44 1.44 0 1 1-2.88 0 1.44 1.44 0 0 1 2.88 0z"/></svg>',
       facebook: '<svg viewBox="0 0 24 24"><path d="M22 12a10 10 0 1 0-11.56 9.88v-6.99H7.9V12h2.54V9.8c0-2.5 1.49-3.89 3.78-3.89 1.1 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56V12h2.78l-.44 2.89h-2.34v6.99A10 10 0 0 0 22 12z"/></svg>',
       x: '<svg viewBox="0 0 24 24"><path d="M18.9 2H22l-7.6 8.7L23.3 22H16.7l-5.2-6.8L5.5 22H2.4l8.1-9.3L1.5 2h6.8l4.7 6.2L18.9 2zm-1.2 18h1.7L7.4 4H5.6l12.1 16z"/></svg>'
     };
-    Object.keys(icons).forEach(key => {
+    Object.entries(icons).forEach(([key, svg]) => {
       const url = social[key];
-      if (url) {
-        wrap.appendChild(el(`<a href="${url}" target="_blank" rel="noopener" aria-label="${key}">${icons[key]}</a>`));
-      }
+      if (url) wrap.appendChild(el(`<a href="${url}" target="_blank" rel="noopener" aria-label="${key}">${svg}</a>`));
     });
   });
 
   safe('footer', () => {
-    document.getElementById('footer-name').textContent = c.name;
-    document.getElementById('footer-year').textContent = new Date().getFullYear();
+    document.getElementById('footer-copy').textContent = `© ${new Date().getFullYear()} ${c.name}`;
   });
+
+  attachReveal();
 }
 
-// Runs a render step in isolation — if it throws, log it and keep going
-// instead of letting one broken section blank out the rest of the page.
-function safe(label, fn) {
-  try {
-    fn();
-  } catch (err) {
-    console.error(`Error rendering "${label}":`, err);
+function renderPhotoCarousel(c) {
+  const photos = (c.photos && c.photos.length) ? c.photos : (c.photo ? [c.photo] : []);
+  const frame = document.getElementById('photo-frame');
+  const prev = document.getElementById('photo-prev');
+  const next = document.getElementById('photo-next');
+  const dots = document.getElementById('photo-dots');
+  if (!frame) return;
+  if (!photos.length) { frame.innerHTML = '<span class="photo-placeholder">Add a photo via admin</span>'; if (prev) prev.hidden = true; if (next) next.hidden = true; return; }
+  let idx = 0;
+  function show(i) {
+    idx = (i + photos.length) % photos.length;
+    frame.innerHTML = '';
+    const img = new Image();
+    img.onerror = () => { frame.innerHTML = `<span class="photo-placeholder">Add photo: ${photos[idx]}</span>`; };
+    img.src = photos[idx];
+    frame.appendChild(img);
+    if (dots) {
+      dots.innerHTML = '';
+      if (photos.length > 1) photos.forEach((_, j) => {
+        const d = el(`<button class="photo-dot${j===idx?' active':''}" type="button" aria-label="Photo ${j+1}"></button>`);
+        d.onclick = () => show(j);
+        dots.appendChild(d);
+      });
+    }
   }
+  const multi = photos.length > 1;
+  if (prev) { prev.hidden = !multi; if (multi) prev.onclick = () => show(idx - 1); }
+  if (next) { next.hidden = !multi; if (multi) next.onclick = () => show(idx + 1); }
+  show(0);
+}
+
+function attachReveal() {
+  const obs = new IntersectionObserver(entries => entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } }), { threshold: 0.08, rootMargin: '0px 0px -28px 0px' });
+  document.querySelectorAll('.reveal:not(.visible)').forEach(el => obs.observe(el));
 }
 
 document.addEventListener('DOMContentLoaded', render);
 
-// Nav dropdown menu toggle
+// Nav — scroll behaviour + burger
 (function () {
-  const btn = document.getElementById('nav-menu-btn');
-  const dropdown = document.getElementById('nav-dropdown');
-  if (!btn || !dropdown) return;
-
-  function close() {
-    dropdown.classList.remove('open');
-    btn.setAttribute('aria-expanded', 'false');
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 40);
+  }, { passive: true });
+  const btn = document.getElementById('nav-burger');
+  const mob = document.getElementById('nav-mobile');
+  if (btn && mob) {
+    btn.addEventListener('click', () => mob.classList.toggle('open'));
+    mob.querySelectorAll('a').forEach(a => a.addEventListener('click', () => mob.classList.remove('open')));
   }
-  btn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    const isOpen = dropdown.classList.toggle('open');
-    btn.setAttribute('aria-expanded', String(isOpen));
-  });
-  document.addEventListener('click', (e) => {
-    if (!dropdown.contains(e.target) && e.target !== btn) close();
-  });
-  dropdown.querySelectorAll('a').forEach(a => a.addEventListener('click', close));
 })();
 
-// Boost-trail style cursor effect (canvas) — a smooth, tapering ribbon
-// that follows the mouse and fades quickly, like a Rocket League / Fortnite
-// vehicle trail, instead of stamped circles.
+// Cursor trail — smooth canvas ribbon
 (function () {
-  if (window.matchMedia && window.matchMedia('(hover: none)').matches) return;
+  if (window.matchMedia('(hover: none)').matches) return;
   const canvas = document.getElementById('trail-canvas');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
-
-  const TRAIL_LIFETIME = 220; // ms — how long a point stays part of the trail (short trail)
-  const HUES = ['255,79,160', '224,69,123', '192,79,224', '255,111,196']; // pink → magenta → purple, as r,g,b
-
-  let points = []; // { x, y, time }
-  let dpr = window.devicePixelRatio || 1;
+  const LIFETIME = 200;
+  const HUES = ['184,92,120', '168,72,100', '196,106,140', '212,121,154'];
+  let points = [], last = null, dpr = window.devicePixelRatio || 1;
 
   function resize() {
     dpr = window.devicePixelRatio || 1;
@@ -322,21 +237,14 @@ document.addEventListener('DOMContentLoaded', render);
   resize();
   window.addEventListener('resize', resize);
 
-  let last = null;
-  document.addEventListener('mousemove', (e) => {
+  document.addEventListener('mousemove', e => {
     const now = performance.now();
     const pt = { x: e.clientX, y: e.clientY, time: now };
-    // Insert interpolated points along big jumps so fast mouse movement
-    // doesn't produce sparse, sharply-angled segments
     if (last) {
-      const dx = pt.x - last.x;
-      const dy = pt.y - last.y;
-      const dist = Math.sqrt(dx * dx + dy * dy);
-      const steps = Math.min(20, Math.floor(dist / 6));
-      for (let s = 1; s < steps; s++) {
-        const f = s / steps;
-        points.push({ x: last.x + dx * f, y: last.y + dy * f, time: now });
-      }
+      const dx = pt.x - last.x, dy = pt.y - last.y;
+      const dist = Math.hypot(dx, dy);
+      const steps = Math.min(16, Math.floor(dist / 5));
+      for (let s = 1; s < steps; s++) points.push({ x: last.x + dx * (s/steps), y: last.y + dy * (s/steps), time: now });
     }
     points.push(pt);
     last = pt;
@@ -344,32 +252,26 @@ document.addEventListener('DOMContentLoaded', render);
 
   function draw() {
     const now = performance.now();
-    points = points.filter(p => now - p.time < TRAIL_LIFETIME);
+    points = points.filter(p => now - p.time < LIFETIME);
     ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
-
     if (points.length > 2) {
       for (let i = 1; i < points.length - 1; i++) {
-        const p0 = points[i - 1];
-        const p1 = points[i];
-        const p2 = points[i + 1];
-        const mid1 = { x: (p0.x + p1.x) / 2, y: (p0.y + p1.y) / 2 };
-        const mid2 = { x: (p1.x + p2.x) / 2, y: (p1.y + p2.y) / 2 };
-
-        const age = (now - p1.time) / TRAIL_LIFETIME; // 0 = new, 1 = old
-        const t = i / points.length; // 0 = tail, 1 = head — controls taper
-        const width = Math.max(1, 14 * t * (1 - age * 0.3));
-        const alpha = Math.max(0, (1 - age) * 0.8 * t);
+        const p0 = points[i-1], p1 = points[i], p2 = points[i+1];
+        const mx1 = (p0.x + p1.x) / 2, my1 = (p0.y + p1.y) / 2;
+        const mx2 = (p1.x + p2.x) / 2, my2 = (p1.y + p2.y) / 2;
+        const age = (now - p1.time) / LIFETIME;
+        const t = i / points.length;
+        const w = Math.max(0.5, 11 * t * (1 - age * 0.5));
+        const a = Math.max(0, (1 - age) * 0.7 * t);
         const hue = HUES[i % HUES.length];
-
         ctx.beginPath();
-        ctx.moveTo(mid1.x, mid1.y);
-        ctx.quadraticCurveTo(p1.x, p1.y, mid2.x, mid2.y);
-        ctx.lineCap = 'round';
-        ctx.lineJoin = 'round';
-        ctx.lineWidth = width;
-        ctx.strokeStyle = `rgba(${hue},${alpha})`;
-        ctx.shadowColor = `rgba(${hue},${alpha})`;
-        ctx.shadowBlur = 10;
+        ctx.moveTo(mx1, my1);
+        ctx.quadraticCurveTo(p1.x, p1.y, mx2, my2);
+        ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+        ctx.lineWidth = w;
+        ctx.strokeStyle = `rgba(${hue},${a})`;
+        ctx.shadowColor = `rgba(${hue},${Math.min(a * 1.4, 0.55)})`;
+        ctx.shadowBlur = 7;
         ctx.stroke();
       }
     }

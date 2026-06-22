@@ -4,152 +4,154 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Ana Chandlee</title>
-<meta name="description" content="Ana Chandlee — Doctor of Physical Therapy Candidate at UIC, Chicago.">
+<meta name="description" content="Ana Chandlee — Doctor of Physical Therapy Candidate, Chicago.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Caveat:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Caveat:wght@700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <canvas id="trail-canvas"></canvas>
+<a href="#contact" class="floating-contact-btn">Contact me</a>
 
-<div class="bg-deco bg-deco--1"></div>
-<div class="bg-deco bg-deco--2"></div>
-<div class="bg-deco bg-deco--3"></div>
-<div class="bg-deco bg-deco--4"></div>
-
-<nav>
-  <div class="wrap">
-    <a href="#top" class="nav-name" id="nav-name">Ana Chandlee</a>
-    <div class="links">
-      <a class="resume-link" id="resume-link" href="#" target="_blank" rel="noopener">Résumé</a>
-      <a href="#contact" class="nav-contact-btn">Contact</a>
-      <button type="button" class="nav-menu-btn" id="nav-menu-btn" aria-label="Open menu" aria-expanded="false">
-        <span></span><span></span><span></span>
-      </button>
-      <div class="nav-dropdown" id="nav-dropdown">
-        <a href="#profile">Profile</a>
-        <a href="#track-record">Experience</a>
-        <a href="#projects">Projects</a>
-        <a href="#certifications">Certifications</a>
-      </div>
+<!-- NAV -->
+<nav id="nav">
+  <div class="nav-inner">
+    <a href="#top" class="nav-logo" id="nav-name">AC</a>
+    <div class="nav-links">
+      <a href="#about">About</a>
+      <a href="#experience">Experience</a>
+      <a href="#work">Work</a>
+      <a href="#contact" class="nav-cta">Say hello</a>
+      <a href="#" id="resume-link" class="nav-resume" target="_blank" rel="noopener">Résumé ↗</a>
     </div>
+    <button class="nav-burger" id="nav-burger" aria-label="Menu">
+      <span></span><span></span>
+    </button>
+  </div>
+  <div class="nav-mobile" id="nav-mobile">
+    <a href="#about">About</a>
+    <a href="#experience">Experience</a>
+    <a href="#work">Work</a>
+    <a href="#contact">Say hello</a>
+    <a href="#" id="mobile-resume-link" target="_blank" rel="noopener">Résumé</a>
   </div>
 </nav>
 
-<a href="#contact" class="floating-contact-btn">Contact me</a>
+<!-- HERO — centered editorial, photo first -->
+<section class="hero" id="top">
+  <p class="hero-eyebrow" id="hero-role"></p>
 
-<header class="hero" id="top">
-  <div class="wrap hero-grid">
-    <div class="hero-copy">
-      <h1 class="display" id="hero-name"></h1>
-      <p class="hero-role" id="hero-role"></p>
-      <p class="hero-sub" id="hero-sub"></p>
-      <div class="hero-actions">
-        <a class="btn btn-primary" id="hero-email-link" href="#contact">Get in touch</a>
-        <a class="btn btn-ghost" id="hero-linkedin-link" href="#" target="_blank" rel="noopener">View LinkedIn</a>
-        <a class="btn btn-ghost" id="hero-resume-link" href="#" target="_blank" rel="noopener">Résumé</a>
+  <div class="hero-photo-wrap">
+    <div class="hero-photo-carousel">
+      <div id="photo-frame" class="hero-photo">
+        <span class="photo-placeholder">Loading…</span>
       </div>
+      <button type="button" class="photo-arrow photo-arrow--prev" id="photo-prev" hidden>‹</button>
+      <button type="button" class="photo-arrow photo-arrow--next" id="photo-next" hidden>›</button>
     </div>
-    <div class="hero-photo-col">
-      <div class="hero-photo-carousel">
-        <div id="photo-frame" class="hero-photo">
-          <span class="photo-placeholder">Loading photo…</span>
-        </div>
-        <button type="button" class="photo-arrow photo-arrow--prev" id="photo-prev" aria-label="Previous photo" hidden>‹</button>
-        <button type="button" class="photo-arrow photo-arrow--next" id="photo-next" aria-label="Next photo" hidden>›</button>
-        <div class="photo-dots" id="photo-dots"></div>
-      </div>
-    </div>
+    <div class="photo-dots" id="photo-dots"></div>
   </div>
-  <div class="wrap">
-    <div class="badge-row" id="stat-row"></div>
-  </div>
-</header>
 
-<section id="profile">
-  <div class="wrap">
-    <div class="profile-grid profile-grid--solo">
-      <div class="profile-text">
-        <h2 class="section-title">A little about me</h2>
-        <p id="about-text"></p>
-        <div class="info-list info-list--inline" id="info-list"></div>
-      </div>
-    </div>
+  <h1 class="hero-name" id="hero-name"></h1>
+  <p class="hero-sub" id="hero-sub"></p>
+
+  <div class="hero-actions">
+    <a href="#contact" class="cta-primary">Get in touch</a>
+    <a href="#" id="hero-linkedin-link" class="cta-ghost" target="_blank" rel="noopener">LinkedIn ↗</a>
   </div>
 </section>
 
-<section id="track-record">
-  <div class="wrap">
-    <div class="section-head">
+<!-- STAT STRIP -->
+<div class="stat-strip">
+  <div class="stat-strip-inner" id="stat-row"></div>
+</div>
+
+<!-- ABOUT -->
+<section class="about-section reveal" id="about">
+  <div class="container">
+    <span class="eyebrow">About me</span>
+    <blockquote class="about-quote" id="about-text"></blockquote>
+    <div class="about-chips" id="info-list"></div>
+    <a href="#" id="about-linkedin-link" class="text-link" target="_blank" rel="noopener">View LinkedIn profile →</a>
+  </div>
+</section>
+
+<!-- EXPERIENCE -->
+<section class="exp-section reveal" id="experience">
+  <div class="container">
+    <div class="exp-top">
+      <span class="eyebrow">Experience</span>
       <h2 class="section-title">Where I've been</h2>
-      <p class="section-desc">Education, clinical, and work experience.</p>
     </div>
-    <div class="zigzag-rail" id="zigzag-rail"></div>
+    <ol class="exp-list" id="zigzag-rail"></ol>
   </div>
 </section>
 
-<section id="certifications">
-  <div class="wrap">
-    <div class="section-head">
-      <h2 class="section-title">Credentials</h2>
-      <p class="section-desc">Certifications, diploma, transcript — view or download anytime.</p>
+<!-- CREDENTIALS + PROJECTS -->
+<section class="work-section reveal" id="work">
+  <div class="container">
+
+    <div class="work-row">
+      <div class="work-label">
+        <span class="eyebrow">Credentials</span>
+        <h2 class="section-title">Certified &amp; documented</h2>
+      </div>
+      <div class="cert-grid" id="cert-grid"></div>
     </div>
-    <div class="cert-grid" id="cert-grid"></div>
+
+    <hr class="work-rule">
+
+    <div class="work-row">
+      <div class="work-label">
+        <span class="eyebrow">Projects</span>
+        <h2 class="section-title">Research &amp; work</h2>
+      </div>
+      <div class="project-grid" id="project-grid"></div>
+    </div>
+
   </div>
 </section>
 
-<section id="projects">
-  <div class="wrap">
-    <div class="section-head">
-      <h2 class="section-title">My projects</h2>
-      <p class="section-desc">Research and projects I've worked on — hover a card to read more.</p>
-    </div>
-    <div class="project-grid" id="project-grid"></div>
-  </div>
-</section>
-
-
-<section id="skills-languages">
-  <div class="wrap">
-    <div class="two-col">
+<!-- SKILLS + LANGUAGES -->
+<section class="skills-section reveal" id="skills-languages">
+  <div class="container">
+    <div class="skills-cols">
       <div>
-        <h2 class="section-title">What I bring</h2>
-        <div class="pill-list" id="skills-list"></div>
+        <span class="eyebrow">What I bring</span>
+        <div class="tag-list" id="skills-list"></div>
       </div>
       <div>
-        <h2 class="section-title">Languages</h2>
-        <div class="pill-list" id="languages-list"></div>
+        <span class="eyebrow">Languages</span>
+        <div class="tag-list" id="languages-list"></div>
       </div>
     </div>
   </div>
 </section>
 
-<section id="contact" class="contact-cta">
-  <div class="wrap">
-    <h2 class="section-title">Let's connect.</h2>
-    <p class="section-desc">Open to opportunities, clinical connections, and conversation.</p>
-    <div class="contact-details-card">
-      <div class="contact-line">
-        <span id="contact-email"></span>
-        <span>·</span>
-        <span id="contact-phone"></span>
-        <span>·</span>
-        <span id="contact-location"></span>
-      </div>
-      <div class="contact-line">
-        <span id="contact-linkedin"></span>
-      </div>
+<!-- CONTACT — full rose hero moment -->
+<section class="contact-section reveal" id="contact">
+  <div class="container">
+    <div class="contact-top">
+      <span class="contact-word-1">Let's</span>
+      <span class="contact-word-2">connect.</span>
+    </div>
+    <p class="contact-sub">Open to clinical opportunities, research, and conversation.</p>
+    <div class="contact-details" id="contact-details">
+      <div class="contact-item" id="contact-email"></div>
+      <div class="contact-item" id="contact-phone"></div>
+      <div class="contact-item" id="contact-location"></div>
+      <div class="contact-item" id="contact-linkedin"></div>
     </div>
   </div>
 </section>
 
 <footer>
-  <div class="social-links" id="social-links"></div>
-  © <span id="footer-year"></span> <span id="footer-name"></span>
-  <div style="margin-top:10px;">
-    <a href="admin.html" style="display:inline-flex; align-items:center; gap:6px; padding:8px 18px; border-radius:100px; border:1px solid var(--line); color:var(--ink-soft); text-decoration:none; font-size:13px; font-weight:600;">Admin login</a>
+  <div class="container footer-inner">
+    <span id="footer-copy"></span>
+    <div class="social-links" id="social-links"></div>
+    <a href="admin.html" class="footer-edit">Admin</a>
   </div>
 </footer>
 
