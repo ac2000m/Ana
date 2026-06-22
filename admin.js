@@ -94,9 +94,9 @@ function renderForm() {
 
   root.appendChild(el(`
     <div class="admin-card">
-      <h2>Hero intro</h2>
-      <p class="note">The short paragraph at the top of the site, under your name.</p>
-      <div class="field"><label>Hero paragraph</label><textarea id="f-heroSub">${esc(working.heroSub)}</textarea></div>
+      <h2>Intro paragraph</h2>
+      <p class="note">The short paragraph shown at the top of your site, below your name.</p>
+      <div class="field"><label>Intro paragraph</label><textarea id="f-heroSub">${esc(working.heroSub)}</textarea></div>
     </div>
   `));
 
@@ -377,21 +377,37 @@ function renderEduList() {
           <div class="field"><label>Years</label><input data-efield="years" data-i="${i}" value="${esc(e.years)}" placeholder="e.g. 2024–2027"></div>
         </div>
         <div class="field"><label>Details (optional)</label><input data-efield="details" data-i="${i}" value="${esc(e.details)}" placeholder="A short note about this"></div>
+        <div class="field">
+          <label>School logo (optional)</label>
+          ${e.logo ? `<img src="${esc(e.logo)}" style="height:32px; width:auto; display:block; margin-bottom:8px; object-fit:contain;">` : ''}
+          <label class="btn-soft" for="edu-logo-${i}" style="cursor:pointer; font-size:12.5px; padding:8px 16px; display:inline-flex;">${e.logo ? 'Replace logo' : '+ Upload logo'}</label>
+          <input type="file" id="edu-logo-${i}" data-edu-logo-i="${i}" accept="image/*" style="display:none;">
+          <span class="edu-logo-status-${i} note" style="margin-left:8px;"></span>
+        </div>
       </div>
     `);
     list.appendChild(item);
   });
   list.querySelectorAll('[data-efield]').forEach(input => {
     input.addEventListener('input', () => {
-      const i = Number(input.dataset.i);
-      working.education[i][input.dataset.efield] = input.value;
+      working.education[Number(input.dataset.i)][input.dataset.efield] = input.value;
+    });
+  });
+  list.querySelectorAll('[data-edu-logo-i]').forEach(input => {
+    input.addEventListener('change', async () => {
+      const file = input.files[0]; if (!file) return;
+      const i = Number(input.dataset.eduLogoI);
+      const status = list.querySelector(`.edu-logo-status-${i}`);
+      if (status) status.textContent = 'Uploading…';
+      try {
+        const url = await uploadAssetFile(file, 'logos');
+        working.education[i].logo = url;
+        renderEduList();
+      } catch (err) { if (status) status.textContent = 'Failed: ' + (err && err.message ? err.message : err); }
     });
   });
   list.querySelectorAll('.remove-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      working.education.splice(Number(btn.dataset.i), 1);
-      renderEduList();
-    });
+    btn.addEventListener('click', () => { working.education.splice(Number(btn.dataset.i), 1); renderEduList(); });
   });
 }
 
@@ -408,21 +424,37 @@ function renderExpList() {
           <div class="field"><label>Years</label><input data-xfield="years" data-i="${i}" value="${esc(x.years)}" placeholder="e.g. 2022–2023"></div>
         </div>
         <div class="field"><label>Details (optional)</label><input data-xfield="details" data-i="${i}" value="${esc(x.details)}" placeholder="A short note about this"></div>
+        <div class="field">
+          <label>Organization logo (optional)</label>
+          ${x.logo ? `<img src="${esc(x.logo)}" style="height:32px; width:auto; display:block; margin-bottom:8px; object-fit:contain;">` : ''}
+          <label class="btn-soft" for="exp-logo-${i}" style="cursor:pointer; font-size:12.5px; padding:8px 16px; display:inline-flex;">${x.logo ? 'Replace logo' : '+ Upload logo'}</label>
+          <input type="file" id="exp-logo-${i}" data-exp-logo-i="${i}" accept="image/*" style="display:none;">
+          <span class="exp-logo-status-${i} note" style="margin-left:8px;"></span>
+        </div>
       </div>
     `);
     list.appendChild(item);
   });
   list.querySelectorAll('[data-xfield]').forEach(input => {
     input.addEventListener('input', () => {
-      const i = Number(input.dataset.i);
-      working.experience[i][input.dataset.xfield] = input.value;
+      working.experience[Number(input.dataset.i)][input.dataset.xfield] = input.value;
+    });
+  });
+  list.querySelectorAll('[data-exp-logo-i]').forEach(input => {
+    input.addEventListener('change', async () => {
+      const file = input.files[0]; if (!file) return;
+      const i = Number(input.dataset.expLogoI);
+      const status = list.querySelector(`.exp-logo-status-${i}`);
+      if (status) status.textContent = 'Uploading…';
+      try {
+        const url = await uploadAssetFile(file, 'logos');
+        working.experience[i].logo = url;
+        renderExpList();
+      } catch (err) { if (status) status.textContent = 'Failed: ' + (err && err.message ? err.message : err); }
     });
   });
   list.querySelectorAll('.remove-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      working.experience.splice(Number(btn.dataset.i), 1);
-      renderExpList();
-    });
+    btn.addEventListener('click', () => { working.experience.splice(Number(btn.dataset.i), 1); renderExpList(); });
   });
 }
 
@@ -464,21 +496,54 @@ function renderProjectList() {
         <div class="field"><label>Tag (optional)</label><input data-pfield="tag" data-i="${i}" value="${esc(p.tag)}" placeholder="e.g. Undergraduate research"></div>
         <div class="field"><label>Short summary (always visible)</label><input data-pfield="summary" data-i="${i}" value="${esc(p.summary)}" placeholder="One sentence shown on the card"></div>
         <div class="field"><label>Full details (shown on hover)</label><textarea data-pfield="details" data-i="${i}" placeholder="A longer paragraph about this project">${esc(p.details)}</textarea></div>
+        <div class="field">
+          <label>Link (optional) — a URL visitors can click to read more</label>
+          <input data-pfield="link" data-i="${i}" value="${esc(p.link)}" placeholder="https://...">
+        </div>
+        <div class="field">
+          <label>File (optional) — a PDF or document</label>
+          ${p.file
+            ? `<a href="${esc(p.file)}" target="_blank" rel="noopener" style="display:block; font-size:13px; color:var(--accent); font-weight:600; word-break:break-all; margin-bottom:8px;">${esc(p.file)}</a>`
+            : ''}
+          <label class="btn-soft" for="proj-file-${i}" style="cursor:pointer; font-size:12.5px; padding:8px 16px; display:inline-flex;">
+            ${p.file ? 'Replace file' : '+ Upload a file'}
+          </label>
+          <input type="file" id="proj-file-${i}" data-proj-upload-i="${i}" accept=".pdf,image/*,.doc,.docx" style="display:none;">
+          <span class="proj-upload-status-${i} note" style="margin-left:8px;"></span>
+        </div>
       </div>
     `);
     list.appendChild(item);
   });
+
   list.querySelectorAll('[data-pfield]').forEach(input => {
     input.addEventListener('input', () => {
       const i = Number(input.dataset.i);
-      const field = input.dataset.pfield;
-      working.projects[i][field] = input.value;
+      working.projects[i][input.dataset.pfield] = input.value;
     });
   });
+
+  // File upload per project
+  list.querySelectorAll('[data-proj-upload-i]').forEach(input => {
+    input.addEventListener('change', async () => {
+      const file = input.files[0];
+      if (!file) return;
+      const i = Number(input.dataset.projUploadI);
+      const status = list.querySelector(`.proj-upload-status-${i}`);
+      if (status) status.textContent = 'Uploading…';
+      try {
+        const url = await uploadAssetFile(file, 'projects');
+        working.projects[i].file = url;
+        renderProjectList();
+      } catch (err) {
+        if (status) status.textContent = 'Upload failed: ' + (err && err.message ? err.message : String(err));
+      }
+    });
+  });
+
   list.querySelectorAll('.remove-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      const i = Number(btn.dataset.i);
-      working.projects.splice(i, 1);
+      working.projects.splice(Number(btn.dataset.i), 1);
       renderProjectList();
     });
   });
