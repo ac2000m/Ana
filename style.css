@@ -189,21 +189,18 @@ nav.scrolled {
 .stat-strip {
   background: var(--rose);
   padding: 40px 0;
-  position: relative;
-  min-height: 120px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 .stat-strip-inner {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: clamp(40px, 8vw, 120px);
-  white-space: nowrap;
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(var(--stat-count, 3), 1fr);
 }
-.stat-item { text-align: center; }
+.stat-item {
+  text-align: center;
+  padding: 0 clamp(16px, 3vw, 48px);
+  border-right: 1px solid rgba(255,255,255,0.2);
+}
+.stat-item:last-child { border-right: none; }
 .stat-num {
   font-family: var(--serif); font-size: clamp(44px, 6vw, 72px);
   font-weight: 600; color: var(--white); line-height: 1.1; display: block;

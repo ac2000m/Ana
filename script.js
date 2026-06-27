@@ -41,6 +41,7 @@ async function render() {
       { num: (c.certifications || []).length, label: 'Certifications' },
       { num: (c.languages || []).length || 1, label: 'Languages' }
     ];
+    row.style.setProperty('--stat-count', stats.length);
     stats.forEach(s => {
       row.appendChild(el(`<div class="stat-item"><span class="stat-num">${s.num}</span><span class="stat-label">${s.label}</span></div>`));
     });
