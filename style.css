@@ -205,8 +205,8 @@ nav.scrolled {
 }
 .stat-item:last-child { border-right: none; }
 .stat-num {
-  font-family: var(--sans); font-size: clamp(44px, 6vw, 72px);
-  font-weight: 300; color: var(--white); line-height: 1; display: block;
+  font-family: "Playfair Display", Georgia, serif; font-size: clamp(44px, 6vw, 72px);
+  font-weight: 700; color: var(--white); line-height: 1; display: block;
   margin-bottom: 8px;
 }
 .stat-label {
