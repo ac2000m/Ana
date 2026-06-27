@@ -200,10 +200,10 @@ nav.scrolled {
 }
 .stat-item {
   text-align: center;
-  background: rgba(255,255,255,0.15);
-  border-radius: 14px;
   padding: 14px 16px;
+  border-right: 1px solid rgba(255,255,255,0.2);
 }
+.stat-item:last-child { border-right: none; }
 .stat-num {
   font-family: var(--serif); font-size: clamp(44px, 6vw, 72px);
   font-weight: 600; color: var(--white); line-height: 1; display: block;
