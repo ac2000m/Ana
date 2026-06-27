@@ -106,18 +106,19 @@ async function render() {
   safe('projects and experience', () => {
     const grid = document.getElementById('work-combined-grid');
     grid.innerHTML = '';
-    // Projects first, then experience_items — all rendered as project cards
-    const allItems = [
-      ...(c.projects || []),
-      ...(c.experience_items || []).map(x => ({ ...x, _isExp: true }))
-    ];
+    const allItems = (c.projects || []).concat(
+      (c.experience_items || []).map(x => ({
+        name: x.name, tag: x.tag, summary: x.summary,
+        details: x.details, link: x.link, file: x.file, logo: x.logo, _isExp: true
+      }))
+    );
     if (allItems.length) {
       const pg = el('<div class="project-grid"></div>');
       allItems.forEach(p => {
         pg.appendChild(el(`
           <div class="project-card">
             ${p.logo ? `<img src="${p.logo}" style="height:32px;width:auto;object-fit:contain;margin-bottom:8px;" loading="lazy">` : ''}
-            <div class="project-name">${p.name}</div>
+            <div class="project-name">${p.name || ''}</div>
             ${p.tag ? `<div class="project-tag">${p.tag}</div>` : ''}
             <p class="project-summary">${p.summary || ''}</p>
             ${p.details ? `<p class="project-details">${p.details}</p>` : ''}
