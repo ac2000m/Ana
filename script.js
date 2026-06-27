@@ -109,9 +109,10 @@ async function render() {
     const allItems = (c.projects || []).concat(
       (c.experience_items || []).map(x => ({
         name: x.name, tag: x.tag, summary: x.summary,
-        details: x.details, link: x.link, file: x.file, logo: x.logo, _isExp: true
+        details: x.details, link: x.link, file: x.file, logo: x.logo
       }))
-    );
+    ).filter(p => p.name && p.name.trim()); // skip blank/malformed entries
+
     if (allItems.length) {
       const pg = el('<div class="project-grid"></div>');
       allItems.forEach(p => {
@@ -121,7 +122,7 @@ async function render() {
             <div class="project-name">${p.name || ''}</div>
             ${p.tag ? `<div class="project-tag">${p.tag}</div>` : ''}
             <p class="project-summary">${p.summary || ''}</p>
-            ${p.details ? `<p class="project-details">${p.details}</p>` : ''}
+            <p class="project-details">${p.details || ''}</p>
             ${p.link || p.file ? `<div class="project-links">
               ${p.link ? `<a class="project-link" href="${p.link}" target="_blank" rel="noopener">View project →</a>` : ''}
               ${p.file ? `<a class="project-link" href="${p.file}" target="_blank" rel="noopener">Download file →</a>` : ''}
