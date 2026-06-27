@@ -188,10 +188,20 @@ nav.scrolled {
    ============================================================ */
 .stat-strip {
   background: var(--rose);
-  padding: 40px var(--pad);
+  padding: 40px 0;
+  position: relative;
+  min-height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .stat-strip-inner {
-  display: flex; justify-content: center; gap: clamp(40px, 8vw, 120px);
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: clamp(40px, 8vw, 120px);
+  white-space: nowrap;
 }
 .stat-item { text-align: center; }
 .stat-num {
