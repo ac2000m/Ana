@@ -83,6 +83,7 @@ function renderForm() {
         <div class="field"><label>"Let's connect" — first word (script text)</label><input id="f-contactWord1" value="${esc(working.contactWord1 || "Let's")}" placeholder="Let's"></div>
         <div class="field"><label>Second word (serif text)</label><input id="f-contactWord2" value="${esc(working.contactWord2 || 'connect.')}" placeholder="connect."></div>
       </div>
+      <div class="field"><label>Contact subtitle</label><input id="f-contactSub" value="${esc(working.contactSub || 'Open to clinical opportunities, research, and conversation.')}" placeholder="Open to opportunities..."></div>
       <div class="field">
         <label>Résumé</label>
         ${working.resume ? `<a href="${esc(working.resume)}" target="_blank" rel="noopener" style="display:block; font-size:13.5px; color:var(--accent); font-weight:600; word-break:break-all; margin-bottom:8px;">${esc(working.resume)}</a>` : ''}
@@ -310,7 +311,7 @@ function renderForm() {
   });
 
   // Wire up basic field listeners
-  ['name','tagline','location','email','phone','linkedin','heroSub','about','contactWord1','contactWord2'].forEach(key => {
+  ['name','tagline','location','email','phone','linkedin','heroSub','about','contactWord1','contactWord2','contactSub'].forEach(key => {
     const node = document.getElementById('f-' + key);
     if (node) node.addEventListener('input', () => { working[key] = node.value; });
   });

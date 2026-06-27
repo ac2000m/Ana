@@ -27,6 +27,7 @@ const SITE_CONTENT = {
   // The big heading text on the contact section — editable from admin too
   contactWord1: "Let's",
   contactWord2: "connect.",
+  contactSub: "Open to clinical opportunities, research, and conversation.",
 
   // ---------- RESUME, PHOTOS & CREDENTIALS ----------
   // These are now best managed from the Edit page (admin.html) — log in
