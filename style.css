@@ -205,9 +205,9 @@ nav.scrolled {
 }
 .stat-item:last-child { border-right: none; }
 .stat-num {
-  font-family: var(--serif); font-size: clamp(44px, 6vw, 72px);
-  font-weight: 600; color: var(--white); line-height: 1; display: block;
-  margin-bottom: 2px;
+  font-family: var(--sans); font-size: clamp(44px, 6vw, 72px);
+  font-weight: 300; color: var(--white); line-height: 1; display: block;
+  margin-bottom: 8px;
 }
 .stat-label {
   font-size: 11px; font-weight: 600; letter-spacing: 0.14em;
