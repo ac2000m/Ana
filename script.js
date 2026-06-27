@@ -13,6 +13,15 @@ async function getSavedOverrides() {
 async function render() {
   const overrides = await getSavedOverrides();
   const c = Object.assign({}, SITE_CONTENT, overrides);
+
+  // If Supabase has experience_items, merge each entry with content.js defaults
+  // so fields like `details` aren't lost just because they weren't in the saved version
+  if (overrides && overrides.experience_items && SITE_CONTENT.experience_items) {
+    c.experience_items = overrides.experience_items.map((item, i) => {
+      const def = SITE_CONTENT.experience_items[i] || {};
+      return Object.assign({}, def, item);
+    });
+  }
   document.title = c.name;
 
   safe('nav', () => {
