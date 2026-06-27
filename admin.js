@@ -273,6 +273,40 @@ function renderForm() {
     renderProjectList();
   });
 
+  const expItemsCard = el(`
+    <div class="admin-card">
+      <h2>Work experience</h2>
+      <p class="note">Jobs, clinical hours, volunteer work — shown in the "Research &amp; work" section alongside your projects.</p>
+      <div id="exp-items-list"></div>
+      <button type="button" class="btn-soft" id="add-exp-item-btn">+ Add experience</button>
+    </div>
+  `);
+  root.appendChild(expItemsCard);
+  renderExpItemsList();
+
+  document.getElementById('add-exp-item-btn').addEventListener('click', () => {
+    working.experience_items = working.experience_items || [];
+    working.experience_items.push({ name: '', tag: 'Work experience', summary: '', details: '', logo: '' });
+    renderExpItemsList();
+  });
+
+  const awardsCard = el(`
+    <div class="admin-card">
+      <h2>Awards &amp; honors</h2>
+      <p class="note">Scholarships, dean's list, athletic awards — this section only shows on your site if you add something here. You can also upload a copy of the award.</p>
+      <div id="awards-list"></div>
+      <button type="button" class="btn-soft" id="add-award-btn">+ Add an award</button>
+    </div>
+  `);
+  root.appendChild(awardsCard);
+  renderAwardsList();
+
+  document.getElementById('add-award-btn').addEventListener('click', () => {
+    working.awards = working.awards || [];
+    working.awards.push({ name: '', issuer: '', date: '', file: '' });
+    renderAwardsList();
+  });
+
   const socialCard = el(`
     <div class="admin-card">
       <h2>Social links</h2>
@@ -450,6 +484,117 @@ function renderLangList() {
       working.languages.splice(Number(btn.dataset.i), 1);
       renderLangList();
     });
+  });
+}
+
+function renderExpItemsList() {
+  const list = document.getElementById('exp-items-list');
+  list.innerHTML = '';
+  (working.experience_items || []).forEach((x, i) => {
+    const item = el(`
+      <div class="cred-item">
+        <button type="button" class="remove-btn" data-i="${i}">Remove ✕</button>
+        <div class="field"><label>Title / role</label><input data-xifield="name" data-i="${i}" value="${esc(x.name)}" placeholder="e.g. Physical Therapy Aide"></div>
+        <div class="row2">
+          <div class="field"><label>Organization / location</label><input data-xifield="summary" data-i="${i}" value="${esc(x.summary)}" placeholder="e.g. Dubuque Physical Therapy"></div>
+          <div class="field"><label>Tag</label><input data-xifield="tag" data-i="${i}" value="${esc(x.tag)}" placeholder="e.g. Work experience"></div>
+        </div>
+        <div class="field"><label>Details (shown on hover)</label><textarea data-xifield="details" data-i="${i}" placeholder="What did you do there?">${esc(x.details)}</textarea></div>
+        <div class="field">
+          <label>Logo (optional)</label>
+          ${x.logo ? `<img src="${esc(x.logo)}" style="height:28px;width:auto;display:block;margin-bottom:8px;object-fit:contain;">` : ''}
+          <label class="btn-soft" for="xi-logo-${i}" style="cursor:pointer;font-size:12.5px;padding:8px 16px;display:inline-flex;">${x.logo ? 'Replace logo' : '+ Upload logo'}</label>
+          <input type="file" id="xi-logo-${i}" data-xi-logo-i="${i}" accept="image/*" style="display:none;">
+          <span class="xi-logo-status-${i} note" style="margin-left:8px;"></span>
+        </div>
+      </div>
+    `);
+    list.appendChild(item);
+  });
+  list.querySelectorAll('[data-xifield]').forEach(input => {
+    input.addEventListener('input', () => {
+      working.experience_items[Number(input.dataset.i)][input.dataset.xifield] = input.value;
+    });
+  });
+  list.querySelectorAll('[data-xi-logo-i]').forEach(input => {
+    input.addEventListener('change', async () => {
+      const file = input.files[0]; if (!file) return;
+      const i = Number(input.dataset.xiLogoI);
+      const status = list.querySelector(`.xi-logo-status-${i}`);
+      if (status) status.textContent = 'Uploading…';
+      try {
+        const url = await uploadAssetFile(file, 'logos');
+        working.experience_items[i].logo = url;
+        renderExpItemsList();
+      } catch (err) { if (status) status.textContent = 'Failed: ' + (err && err.message ? err.message : err); }
+    });
+  });
+  list.querySelectorAll('.remove-btn').forEach(btn => {
+    btn.addEventListener('click', () => { working.experience_items.splice(Number(btn.dataset.i), 1); renderExpItemsList(); });
+  });
+}
+
+function renderAwardsList() {
+  const list = document.getElementById('awards-list');
+  list.innerHTML = '';
+  (working.awards || []).forEach((a, i) => {
+    const item = el(`
+      <div class="cred-item" draggable="true" data-award-i="${i}" style="cursor:grab;">
+        <button type="button" class="remove-btn" data-i="${i}">Remove ✕</button>
+        <div class="field"><label>Award name</label><input data-afield="name" data-i="${i}" value="${esc(a.name)}" placeholder="e.g. Dean's List"></div>
+        <div class="row2">
+          <div class="field"><label>Issuer</label><input data-afield="issuer" data-i="${i}" value="${esc(a.issuer)}" placeholder="e.g. Loras College"></div>
+          <div class="field"><label>Date</label><input data-afield="date" data-i="${i}" value="${esc(a.date)}" placeholder="e.g. Spring 2024"></div>
+        </div>
+        <div class="field">
+          <label>Copy of award (optional)</label>
+          ${a.file ? `<a href="${esc(a.file)}" target="_blank" rel="noopener" style="display:block;font-size:13px;color:var(--accent);font-weight:600;word-break:break-all;margin-bottom:8px;">${esc(a.file)}</a>` : ''}
+          <div class="dropzone" id="award-dz-${i}">
+            <div class="dz-title">${a.file ? 'Drop to replace, or click to browse' : 'Drag a file here, or click to browse'}</div>
+            <div class="dz-sub">PDF or image</div>
+            <input type="file" id="award-file-${i}" data-award-file-i="${i}" accept=".pdf,image/*">
+          </div>
+          <div id="award-file-status-${i}" class="note" style="margin-top:6px;"></div>
+        </div>
+      </div>
+    `);
+    list.appendChild(item);
+  });
+  list.querySelectorAll('[data-afield]').forEach(input => {
+    input.addEventListener('input', () => {
+      working.awards[Number(input.dataset.i)][input.dataset.afield] = input.value;
+    });
+  });
+  // Dropzones for award files
+  (working.awards || []).forEach((_, i) => {
+    setupDropzone(`award-dz-${i}`, `award-file-${i}`, async (file) => {
+      const status = document.getElementById(`award-file-status-${i}`);
+      if (status) status.textContent = 'Uploading…';
+      try {
+        const url = await uploadAssetFile(file, 'awards');
+        working.awards[i].file = url;
+        renderAwardsList();
+      } catch (err) { if (status) status.textContent = 'Failed: ' + (err && err.message ? err.message : err); }
+    });
+  });
+  // Drag to reorder
+  let dragSrc = null;
+  list.querySelectorAll('[data-award-i]').forEach(row => {
+    row.addEventListener('dragstart', () => { dragSrc = Number(row.dataset.awardI); row.style.opacity = '0.4'; });
+    row.addEventListener('dragend', () => { row.style.opacity = '1'; });
+    row.addEventListener('dragover', (e) => { e.preventDefault(); row.style.background = 'var(--accent-soft)'; });
+    row.addEventListener('dragleave', () => { row.style.background = ''; });
+    row.addEventListener('drop', (e) => {
+      e.preventDefault(); row.style.background = '';
+      const target = Number(row.dataset.awardI);
+      if (dragSrc === null || dragSrc === target) return;
+      const moved = working.awards.splice(dragSrc, 1)[0];
+      working.awards.splice(target, 0, moved);
+      renderAwardsList();
+    });
+  });
+  list.querySelectorAll('.remove-btn').forEach(btn => {
+    btn.addEventListener('click', () => { working.awards.splice(Number(btn.dataset.i), 1); renderAwardsList(); });
   });
 }
 

@@ -68,23 +68,20 @@ async function render() {
     });
   });
 
-  safe('experience', () => {
+  safe('education', () => {
     const list = document.getElementById('zigzag-rail');
     list.innerHTML = '';
-    const items = []
-      .concat((c.education || []).map(e => ({ years: e.years, title: e.degree, org: e.school, detail: e.details, logo: e.logo })))
-      .concat((c.experience || []).map(x => ({ years: x.years, title: x.title, org: x.organization, detail: x.details, logo: x.logo })));
-    items.forEach(item => {
+    (c.education || []).forEach(e => {
       list.appendChild(el(`
         <li class="exp-item reveal">
           <div class="exp-left">
-            <div class="exp-year">${item.years || ''}</div>
-            ${item.logo ? `<img class="exp-logo" src="${item.logo}" alt="${item.org || ''}" loading="lazy">` : ''}
+            <div class="exp-year">${e.years || ''}</div>
+            ${e.logo ? `<img class="exp-logo" src="${e.logo}" alt="${e.school || ''}" loading="lazy">` : ''}
           </div>
           <div class="exp-content">
-            <div class="exp-title">${item.title || ''}</div>
-            <div class="exp-org">${item.org || ''}</div>
-            ${item.detail ? `<div class="exp-detail">${item.detail}</div>` : ''}
+            <div class="exp-title">${e.degree || ''}</div>
+            <div class="exp-org">${e.school || ''}</div>
+            ${e.details ? `<div class="exp-detail">${e.details}</div>` : ''}
           </div>
         </li>
       `));
@@ -106,13 +103,20 @@ async function render() {
     });
   });
 
-  safe('projects', () => {
-    const grid = document.getElementById('project-grid');
+  safe('projects and experience', () => {
+    const grid = document.getElementById('work-combined-grid');
     grid.innerHTML = '';
-    if (c.projects && c.projects.length) {
-      c.projects.forEach(p => {
-        grid.appendChild(el(`
+    // Projects first, then experience_items — all rendered as project cards
+    const allItems = [
+      ...(c.projects || []),
+      ...(c.experience_items || []).map(x => ({ ...x, _isExp: true }))
+    ];
+    if (allItems.length) {
+      const pg = el('<div class="project-grid"></div>');
+      allItems.forEach(p => {
+        pg.appendChild(el(`
           <div class="project-card">
+            ${p.logo ? `<img src="${p.logo}" style="height:32px;width:auto;object-fit:contain;margin-bottom:8px;" loading="lazy">` : ''}
             <div class="project-name">${p.name}</div>
             ${p.tag ? `<div class="project-tag">${p.tag}</div>` : ''}
             <p class="project-summary">${p.summary || ''}</p>
@@ -124,7 +128,29 @@ async function render() {
           </div>
         `));
       });
+      grid.appendChild(pg);
+    } else {
+      grid.innerHTML = '<p style="color:var(--ink-3);font-size:14px;">No projects or experience added yet.</p>';
     }
+  });
+
+  safe('awards', () => {
+    const awards = c.awards || [];
+    const row = document.getElementById('awards-row');
+    if (!row) return;
+    if (!awards.length) { row.style.display = 'none'; return; }
+    row.style.display = '';
+    const grid = document.getElementById('awards-grid');
+    grid.innerHTML = '';
+    awards.forEach(a => {
+      grid.appendChild(el(`
+        <div class="cert-card">
+          <div class="cert-name">${a.name}</div>
+          <div class="cert-meta">${a.issuer || ''}${a.date ? ' · ' + a.date : ''}</div>
+          ${a.file ? `<a class="cert-link" href="${a.file}" target="_blank" rel="noopener">View award →</a>` : ''}
+        </div>
+      `));
+    });
   });
 
   safe('skills', () => {

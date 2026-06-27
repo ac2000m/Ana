@@ -283,6 +283,7 @@ nav.scrolled {
 .work-rule { border: none; border-top: 1px solid var(--rule); }
 
 .cert-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; }
+.awards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; }
 .cert-card {
   background: var(--white); border: 1px solid var(--rule);
   border-radius: 14px; padding: 22px;
