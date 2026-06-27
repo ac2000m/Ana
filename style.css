@@ -378,7 +378,7 @@ footer { background: var(--ink); border-top: 1px solid rgba(255,255,255,0.06); p
 }
 .footer-inner #footer-copy { flex: 1; text-align: left; }
 .footer-inner .social-links { flex: 0; }
-.footer-inner .footer-edit { flex: 1; text-align: right; }
+.footer-inner .footer-edit { flex: 0; text-align: right; padding: 4px 8px; }
 .footer-edit { font-size: 12px; color: rgba(255,255,255,0.25); transition: color 0.15s; }
 .footer-edit:hover { color: var(--rose-mid); }
 .social-links { display: flex; gap: 10px; }

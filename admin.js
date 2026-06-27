@@ -79,6 +79,10 @@ function renderForm() {
         <div class="field"><label>Phone</label><input id="f-phone" value="${esc(working.phone)}"></div>
       </div>
       <div class="field"><label>LinkedIn URL</label><input id="f-linkedin" value="${esc(working.linkedin)}"></div>
+      <div class="row2">
+        <div class="field"><label>"Let's connect" — first word (script text)</label><input id="f-contactWord1" value="${esc(working.contactWord1 || "Let's")}" placeholder="Let's"></div>
+        <div class="field"><label>Second word (serif text)</label><input id="f-contactWord2" value="${esc(working.contactWord2 || 'connect.')}" placeholder="connect."></div>
+      </div>
       <div class="field">
         <label>Résumé</label>
         ${working.resume ? `<a href="${esc(working.resume)}" target="_blank" rel="noopener" style="display:block; font-size:13.5px; color:var(--accent); font-weight:600; word-break:break-all; margin-bottom:8px;">${esc(working.resume)}</a>` : ''}
@@ -306,7 +310,7 @@ function renderForm() {
   });
 
   // Wire up basic field listeners
-  ['name','tagline','location','email','phone','linkedin','heroSub','about'].forEach(key => {
+  ['name','tagline','location','email','phone','linkedin','heroSub','about','contactWord1','contactWord2'].forEach(key => {
     const node = document.getElementById('f-' + key);
     if (node) node.addEventListener('input', () => { working[key] = node.value; });
   });
@@ -317,7 +321,8 @@ function renderPhotoList() {
   list.innerHTML = '';
   (working.photos || []).forEach((path, i) => {
     const item = el(`
-      <div class="cred-item" style="display:flex; align-items:center; gap:14px;">
+      <div class="cred-item" style="display:flex; align-items:center; gap:14px; cursor:grab;" draggable="true" data-photo-i="${i}">
+        <span style="font-size:20px; color:var(--muted); cursor:grab; user-select:none;" title="Drag to reorder">⠿</span>
         <img src="${esc(path)}" style="width:56px; height:56px; object-fit:cover; border-radius:10px; background:var(--accent-soft, #FBDCEA); flex-shrink:0;" onerror="this.style.opacity=0.3">
         <div style="flex:1; min-width:0;">
           <div style="font-size:13px; font-weight:600; color:var(--ink);">${i === 0 ? 'Headshot (shown first)' : 'Photo ' + (i + 1)}</div>
@@ -328,10 +333,32 @@ function renderPhotoList() {
     `);
     list.appendChild(item);
   });
+
+  // Drag-to-reorder
+  let dragSrc = null;
+  list.querySelectorAll('[data-photo-i]').forEach(row => {
+    row.addEventListener('dragstart', (e) => {
+      dragSrc = Number(row.dataset.photoI);
+      e.dataTransfer.effectAllowed = 'move';
+      row.style.opacity = '0.4';
+    });
+    row.addEventListener('dragend', () => { row.style.opacity = '1'; });
+    row.addEventListener('dragover', (e) => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; row.style.background = 'var(--accent-soft)'; });
+    row.addEventListener('dragleave', () => { row.style.background = ''; });
+    row.addEventListener('drop', (e) => {
+      e.preventDefault();
+      row.style.background = '';
+      const dropTarget = Number(row.dataset.photoI);
+      if (dragSrc === null || dragSrc === dropTarget) return;
+      const moved = working.photos.splice(dragSrc, 1)[0];
+      working.photos.splice(dropTarget, 0, moved);
+      renderPhotoList();
+    });
+  });
+
   list.querySelectorAll('.remove-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      const i = Number(btn.dataset.i);
-      working.photos.splice(i, 1);
+      working.photos.splice(Number(btn.dataset.i), 1);
       renderPhotoList();
     });
   });

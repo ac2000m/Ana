@@ -22,7 +22,11 @@ const SITE_CONTENT = {
   // Update these any time your contact info changes.
   email: "ana.chandlee@example.com",
   phone: "(555) 123-4567",
-  linkedin: "https://www.linkedin.com/in/ana-chandlee", // replace with your real LinkedIn URL
+  linkedin: "https://www.linkedin.com/in/ana-chandlee",
+
+  // The big heading text on the contact section — editable from admin too
+  contactWord1: "Let's",
+  contactWord2: "connect.",
 
   // ---------- RESUME, PHOTOS & CREDENTIALS ----------
   // These are now best managed from the Edit page (admin.html) — log in
