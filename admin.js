@@ -231,13 +231,45 @@ function renderForm() {
   const skillsCard = el(`
     <div class="admin-card">
       <h2>What I bring (skills)</h2>
-      <p class="note">A simple list of skills — one per line.</p>
-      <textarea id="f-skills" style="min-height:120px;">${esc((working.skills || []).join('\n'))}</textarea>
+      <p class="note">Add skills one at a time — they appear as tags on your site.</p>
+      <div id="skills-pill-list" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;min-height:32px;"></div>
+      <div style="display:flex;gap:10px;align-items:center;">
+        <input id="skills-new-input" placeholder="e.g. Patient Education" style="flex:1;" onkeydown="if(event.key==='Enter'){event.preventDefault();document.getElementById('skills-add-btn').click();}">
+        <button type="button" class="btn-soft" id="skills-add-btn" style="white-space:nowrap;">+ Add</button>
+      </div>
     </div>
   `);
   root.appendChild(skillsCard);
-  document.getElementById('f-skills').addEventListener('input', (e) => {
-    working.skills = e.target.value.split('\n').map(s => s.trim()).filter(Boolean);
+
+  function renderSkillsPills() {
+    const container = document.getElementById('skills-pill-list');
+    container.innerHTML = '';
+    (working.skills || []).forEach((skill, i) => {
+      const pill = el(`
+        <span style="display:inline-flex;align-items:center;gap:6px;padding:6px 12px;background:var(--accent-soft,#FBDCEA);border-radius:100px;font-size:13.5px;font-weight:500;color:var(--ink);">
+          ${esc(skill)}
+          <button type="button" data-skill-i="${i}" style="background:none;border:none;cursor:pointer;font-size:14px;color:var(--muted);line-height:1;padding:0;" title="Remove">✕</button>
+        </span>
+      `);
+      container.appendChild(pill);
+    });
+    container.querySelectorAll('[data-skill-i]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        working.skills.splice(Number(btn.dataset.skillI), 1);
+        renderSkillsPills();
+      });
+    });
+  }
+  renderSkillsPills();
+
+  document.getElementById('skills-add-btn').addEventListener('click', () => {
+    const input = document.getElementById('skills-new-input');
+    const val = input.value.trim();
+    if (!val) return;
+    working.skills = working.skills || [];
+    working.skills.push(val);
+    input.value = '';
+    renderSkillsPills();
   });
 
   const langCard = el(`
@@ -606,24 +638,45 @@ function renderProjectList() {
       <div class="cred-item">
         <button type="button" class="remove-btn" data-i="${i}">Remove ✕</button>
         <div class="field"><label>Project name</label><input data-pfield="name" data-i="${i}" value="${esc(p.name)}" placeholder="e.g. Concussion Recovery in Student Athletes"></div>
-        <div class="field"><label>Tag (optional)</label><input data-pfield="tag" data-i="${i}" value="${esc(p.tag)}" placeholder="e.g. Undergraduate research"></div>
+        <div class="row2">
+          <div class="field"><label>Tag (optional)</label><input data-pfield="tag" data-i="${i}" value="${esc(p.tag)}" placeholder="e.g. Undergraduate research"></div>
+          <div class="field"><label>Link (optional)</label><input data-pfield="link" data-i="${i}" value="${esc(p.link)}" placeholder="https://..."></div>
+        </div>
         <div class="field"><label>Short summary (always visible)</label><input data-pfield="summary" data-i="${i}" value="${esc(p.summary)}" placeholder="One sentence shown on the card"></div>
         <div class="field"><label>Full details (shown on hover)</label><textarea data-pfield="details" data-i="${i}" placeholder="A longer paragraph about this project">${esc(p.details)}</textarea></div>
+        <div class="field">
+          <label>File (optional — PDF, image, etc.)</label>
+          ${p.file ? `<a href="${esc(p.file)}" target="_blank" rel="noopener" style="display:block;font-size:13px;color:var(--accent);font-weight:600;word-break:break-all;margin-bottom:8px;">${esc(p.file)}</a>` : ''}
+          <div class="dropzone" id="proj-dz-${i}">
+            <div class="dz-title">${p.file ? 'Drop to replace, or click to browse' : 'Drag a file here, or click to browse'}</div>
+            <div class="dz-sub">PDF or image</div>
+            <input type="file" id="proj-file-${i}" data-proj-file-i="${i}" accept=".pdf,image/*,.doc,.docx">
+          </div>
+          <div id="proj-file-status-${i}" class="note" style="margin-top:6px;"></div>
+        </div>
       </div>
     `);
     list.appendChild(item);
   });
   list.querySelectorAll('[data-pfield]').forEach(input => {
     input.addEventListener('input', () => {
-      const i = Number(input.dataset.i);
-      const field = input.dataset.pfield;
-      working.projects[i][field] = input.value;
+      working.projects[Number(input.dataset.i)][input.dataset.pfield] = input.value;
+    });
+  });
+  (working.projects || []).forEach((_, i) => {
+    setupDropzone(`proj-dz-${i}`, `proj-file-${i}`, async (file) => {
+      const status = document.getElementById(`proj-file-status-${i}`);
+      if (status) status.textContent = 'Uploading…';
+      try {
+        const url = await uploadAssetFile(file, 'projects');
+        working.projects[i].file = url;
+        renderProjectList();
+      } catch (err) { if (status) status.textContent = 'Failed: ' + (err && err.message ? err.message : err); }
     });
   });
   list.querySelectorAll('.remove-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      const i = Number(btn.dataset.i);
-      working.projects.splice(i, 1);
+      working.projects.splice(Number(btn.dataset.i), 1);
       renderProjectList();
     });
   });

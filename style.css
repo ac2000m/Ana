@@ -307,7 +307,7 @@ nav.scrolled {
 .project-summary { font-size: 14px; color: var(--ink-3); line-height: 1.6; }
 .project-details { font-size: 14px; color: var(--ink-3); line-height: 1.6; max-height: 0; opacity: 0; overflow: hidden; transition: max-height 0.35s, opacity 0.3s, margin-top 0.3s; }
 .project-card:hover .project-details { max-height: 260px; opacity: 1; margin-top: 12px; }
-.project-card:hover .project-summary { display: none; }
+
 .project-links { display: flex; gap: 14px; margin-top: 14px; flex-wrap: wrap; border-top: 1px solid var(--rule); padding-top: 12px; }
 .project-link { font-size: 13px; font-weight: 600; color: var(--rose); }
 .project-link:hover { text-decoration: underline; }
@@ -379,7 +379,7 @@ footer { background: var(--ink); border-top: 1px solid rgba(255,255,255,0.06); p
 }
 .footer-edit { font-size: 12px; color: rgba(255,255,255,0.25); transition: color 0.15s; }
 .footer-edit:hover { color: var(--rose-mid); }
-.social-links { display: flex; gap: 10px; }
+.social-links { display: flex; gap: 10px; justify-content: center; }
 .social-links a {
   display: flex; align-items: center; justify-content: center;
   width: 34px; height: 34px; border-radius: 50%;
