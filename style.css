@@ -188,7 +188,7 @@ nav.scrolled {
    ============================================================ */
 .stat-strip {
   background: var(--rose);
-  padding: 40px 0;
+  padding: 24px 0;
 }
 .stat-strip-inner {
   width: 100%;
@@ -197,7 +197,7 @@ nav.scrolled {
 }
 .stat-item {
   text-align: center;
-  padding: 0 clamp(16px, 3vw, 48px);
+  padding: 0 clamp(12px, 2vw, 28px);
   border-right: 1px solid rgba(255,255,255,0.2);
 }
 .stat-item:last-child { border-right: none; }
