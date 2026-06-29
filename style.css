@@ -239,7 +239,7 @@ nav.scrolled {
 /* ============================================================
    ABOUT
    ============================================================ */
-.about-section { padding: 100px var(--pad); }
+.about-section { padding: 60px var(--pad); }
 .about-section .container { max-width: 760px; }
 .about-quote {
   font-family: var(--serif); font-style: italic;
@@ -258,7 +258,7 @@ nav.scrolled {
    EXPERIENCE
    ============================================================ */
 .exp-section {
-  padding: 100px var(--pad);
+  padding: 60px var(--pad);
   background: var(--rose-pale);
 }
 .exp-section .eyebrow { color: var(--rose); }
@@ -286,7 +286,7 @@ nav.scrolled {
 /* ============================================================
    WORK (credentials + projects)
    ============================================================ */
-.work-section { padding: 100px var(--pad); }
+.work-section { padding: 60px var(--pad); }
 .work-row { padding: 48px 0; }
 .work-label { margin-bottom: 32px; }
 .work-rule { border: none; border-top: 1px solid var(--rule); }
