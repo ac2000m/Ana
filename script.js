@@ -166,9 +166,11 @@ async function render() {
   });
 
   safe('skills', () => {
-    ['skills-list', 'languages-list'].forEach(id => document.getElementById(id).innerHTML = '');
-    (c.skills || []).forEach(s => document.getElementById('skills-list').appendChild(el(`<span class="tag">${s}</span>`)));
-    (c.languages || []).forEach(l => document.getElementById('languages-list').appendChild(el(`<span class="tag">${l.name}${l.level ? ' — ' + l.level : ''}</span>`)));
+    const skillsList = document.getElementById('skills-list');
+    if (skillsList) {
+      skillsList.innerHTML = '';
+      (c.skills || []).forEach(s => skillsList.appendChild(el(`<span class="tag">${s}</span>`)));
+    }
   });
 
   safe('contact', () => {

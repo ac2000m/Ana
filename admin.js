@@ -216,23 +216,6 @@ function renderForm() {
     renderEduList();
   });
 
-  const expCard = el(`
-    <div class="admin-card">
-      <h2>Experience</h2>
-      <p class="note">Jobs, internships, clinical hours, volunteer work — shows in "Where I've been."</p>
-      <div id="exp-list"></div>
-      <button type="button" class="btn-soft" id="add-exp-btn">+ Add experience</button>
-    </div>
-  `);
-  root.appendChild(expCard);
-  renderExpList();
-
-  document.getElementById('add-exp-btn').addEventListener('click', () => {
-    working.experience = working.experience || [];
-    working.experience.push({ title: '', organization: '', years: '', details: '' });
-    renderExpList();
-  });
-
   const skillsCard = el(`
     <div class="admin-card">
       <h2>What I bring (skills)</h2>
@@ -312,8 +295,8 @@ function renderForm() {
 
   const expItemsCard = el(`
     <div class="admin-card">
-      <h2>Work experience</h2>
-      <p class="note">Jobs, clinical hours, volunteer work — shown in the "Research &amp; work" section alongside your projects.</p>
+      <h2>Work Experience</h2>
+      <p class="note">Jobs, clinical hours, internships, volunteer work — shown in the "Research &amp; work" section alongside your projects.</p>
       <div id="exp-items-list"></div>
       <button type="button" class="btn-soft" id="add-exp-item-btn">+ Add experience</button>
     </div>

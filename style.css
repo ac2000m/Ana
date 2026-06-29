@@ -39,7 +39,7 @@ img { display: block; max-width: 100%; }
 button { font-family: inherit; }
 
 /* Canvas trail */
-#trail-canvas { position: fixed; inset: 0; pointer-events: none; z-index: 9999; mix-blend-mode: multiply; }
+#trail-canvas { position: fixed; inset: 0; pointer-events: none; z-index: 9999; }
 @media (hover: none) { #trail-canvas { display: none; } }
 
 /* Floating contact tab */
