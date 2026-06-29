@@ -387,12 +387,11 @@ footer { background: var(--ink); border-top: 1px solid rgba(255,255,255,0.06); p
   display: flex; align-items: center; justify-content: space-between;
   font-size: 13px; color: rgba(255,255,255,0.3);
 }
-.footer-inner #footer-copy { white-space: nowrap; }
+.footer-inner #footer-copy { flex: 0; white-space: nowrap; }
 .footer-inner .social-links {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
+  position: absolute; left: 50%; transform: translateX(-50%);
 }
+.footer-inner .footer-edit { flex: 0; }
 .footer-edit { font-size: 12px; color: rgba(255,255,255,0.25); transition: color 0.15s; }
 .footer-edit:hover { color: var(--rose-mid); }
 .social-links { display: flex; gap: 10px; }

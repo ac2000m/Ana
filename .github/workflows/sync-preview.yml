@@ -1,9 +1,6 @@
-name: Sync preview to main
+name: Sync preview branches to main
 
-# Whenever main changes, automatically make preview an exact copy of it.
-# This means: edit main -> preview updates itself, no manual merge needed.
-# (Going the other direction still requires a manual PR, since preview is
-# meant for testing changes before they're "official" on main.)
+# Whenever main changes, automatically make preview2 an exact copy of it.
 
 on:
   push:
@@ -22,9 +19,9 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Force preview to match main
+      - name: Force preview2 to match main
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git checkout -B preview origin/main
-          git push --force origin preview
+          git checkout -B preview2 origin/main
+          git push --force origin preview2

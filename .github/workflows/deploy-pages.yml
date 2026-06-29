@@ -1,10 +1,12 @@
-name: Deploy site (main + preview)
+name: Deploy site (main + preview + preview2)
 
 on:
   push:
     branches:
       - main
       - preview
+      - preview2
+      - preview3
   workflow_dispatch:
 
 permissions:
@@ -36,6 +38,20 @@ jobs:
           ref: preview
           path: site-preview
 
+      - name: Checkout preview2 branch (if it exists)
+        uses: actions/checkout@v4
+        continue-on-error: true
+        with:
+          ref: preview2
+          path: site-preview2
+
+      - name: Checkout preview3 branch (if it exists)
+        uses: actions/checkout@v4
+        continue-on-error: true
+        with:
+          ref: preview3
+          path: site-preview3
+
       - name: Assemble combined site
         run: |
           mkdir -p combined
@@ -44,8 +60,15 @@ jobs:
             mkdir -p combined/preview
             cp -r site-preview/. combined/preview/
           fi
-          # Don't publish the workflow files themselves
-          rm -rf combined/.github combined/preview/.github 2>/dev/null || true
+          if [ -d "site-preview2" ]; then
+            mkdir -p combined/preview2
+            cp -r site-preview2/. combined/preview2/
+          fi
+          if [ -d "site-preview3" ]; then
+            mkdir -p combined/preview3
+            cp -r site-preview3/. combined/preview3/
+          fi
+          rm -rf combined/.github combined/preview/.github combined/preview2/.github combined/preview3/.github 2>/dev/null || true
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

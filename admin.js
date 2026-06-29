@@ -79,6 +79,11 @@ function renderForm() {
         <div class="field"><label>Phone</label><input id="f-phone" value="${esc(working.phone)}"></div>
       </div>
       <div class="field"><label>LinkedIn URL</label><input id="f-linkedin" value="${esc(working.linkedin)}"></div>
+      <div class="row2">
+        <div class="field"><label>"Let's connect" — first word (script text)</label><input id="f-contactWord1" value="${esc(working.contactWord1 || "Let's")}" placeholder="Let's"></div>
+        <div class="field"><label>Second word (serif text)</label><input id="f-contactWord2" value="${esc(working.contactWord2 || 'connect.')}" placeholder="connect."></div>
+      </div>
+      <div class="field"><label>Contact subtitle</label><input id="f-contactSub" value="${esc(working.contactSub || 'Open to clinical opportunities, research, and conversation.')}" placeholder="Open to opportunities..."></div>
       <div class="field">
         <label>Résumé</label>
         ${working.resume ? `<a href="${esc(working.resume)}" target="_blank" rel="noopener" style="display:block; font-size:13.5px; color:var(--accent); font-weight:600; word-break:break-all; margin-bottom:8px;">${esc(working.resume)}</a>` : ''}
@@ -94,9 +99,9 @@ function renderForm() {
 
   root.appendChild(el(`
     <div class="admin-card">
-      <h2>Hero intro</h2>
-      <p class="note">The short paragraph at the top of the site, under your name.</p>
-      <div class="field"><label>Hero paragraph</label><textarea id="f-heroSub">${esc(working.heroSub)}</textarea></div>
+      <h2>Intro paragraph</h2>
+      <p class="note">The short paragraph shown at the top of your site, below your name.</p>
+      <div class="field"><label>Intro paragraph</label><textarea id="f-heroSub">${esc(working.heroSub)}</textarea></div>
     </div>
   `));
 
@@ -372,7 +377,7 @@ function renderForm() {
   });
 
   // Wire up basic field listeners
-  ['name','tagline','location','email','phone','linkedin','heroSub','about'].forEach(key => {
+  ['name','tagline','location','email','phone','linkedin','heroSub','about','contactWord1','contactWord2','contactSub'].forEach(key => {
     const node = document.getElementById('f-' + key);
     if (node) node.addEventListener('input', () => { working[key] = node.value; });
   });
@@ -383,7 +388,8 @@ function renderPhotoList() {
   list.innerHTML = '';
   (working.photos || []).forEach((path, i) => {
     const item = el(`
-      <div class="cred-item" style="display:flex; align-items:center; gap:14px;">
+      <div class="cred-item" style="display:flex; align-items:center; gap:14px; cursor:grab;" draggable="true" data-photo-i="${i}">
+        <span style="font-size:20px; color:var(--muted); cursor:grab; user-select:none;" title="Drag to reorder">⠿</span>
         <img src="${esc(path)}" style="width:56px; height:56px; object-fit:cover; border-radius:10px; background:var(--accent-soft, #FBDCEA); flex-shrink:0;" onerror="this.style.opacity=0.3">
         <div style="flex:1; min-width:0;">
           <div style="font-size:13px; font-weight:600; color:var(--ink);">${i === 0 ? 'Headshot (shown first)' : 'Photo ' + (i + 1)}</div>
@@ -394,10 +400,32 @@ function renderPhotoList() {
     `);
     list.appendChild(item);
   });
+
+  // Drag-to-reorder
+  let dragSrc = null;
+  list.querySelectorAll('[data-photo-i]').forEach(row => {
+    row.addEventListener('dragstart', (e) => {
+      dragSrc = Number(row.dataset.photoI);
+      e.dataTransfer.effectAllowed = 'move';
+      row.style.opacity = '0.4';
+    });
+    row.addEventListener('dragend', () => { row.style.opacity = '1'; });
+    row.addEventListener('dragover', (e) => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; row.style.background = 'var(--accent-soft)'; });
+    row.addEventListener('dragleave', () => { row.style.background = ''; });
+    row.addEventListener('drop', (e) => {
+      e.preventDefault();
+      row.style.background = '';
+      const dropTarget = Number(row.dataset.photoI);
+      if (dragSrc === null || dragSrc === dropTarget) return;
+      const moved = working.photos.splice(dragSrc, 1)[0];
+      working.photos.splice(dropTarget, 0, moved);
+      renderPhotoList();
+    });
+  });
+
   list.querySelectorAll('.remove-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      const i = Number(btn.dataset.i);
-      working.photos.splice(i, 1);
+      working.photos.splice(Number(btn.dataset.i), 1);
       renderPhotoList();
     });
   });
@@ -443,21 +471,37 @@ function renderEduList() {
           <div class="field"><label>Years</label><input data-efield="years" data-i="${i}" value="${esc(e.years)}" placeholder="e.g. 2024–2027"></div>
         </div>
         <div class="field"><label>Details (optional)</label><input data-efield="details" data-i="${i}" value="${esc(e.details)}" placeholder="A short note about this"></div>
+        <div class="field">
+          <label>School logo (optional)</label>
+          ${e.logo ? `<img src="${esc(e.logo)}" style="height:32px; width:auto; display:block; margin-bottom:8px; object-fit:contain;">` : ''}
+          <label class="btn-soft" for="edu-logo-${i}" style="cursor:pointer; font-size:12.5px; padding:8px 16px; display:inline-flex;">${e.logo ? 'Replace logo' : '+ Upload logo'}</label>
+          <input type="file" id="edu-logo-${i}" data-edu-logo-i="${i}" accept="image/*" style="display:none;">
+          <span class="edu-logo-status-${i} note" style="margin-left:8px;"></span>
+        </div>
       </div>
     `);
     list.appendChild(item);
   });
   list.querySelectorAll('[data-efield]').forEach(input => {
     input.addEventListener('input', () => {
-      const i = Number(input.dataset.i);
-      working.education[i][input.dataset.efield] = input.value;
+      working.education[Number(input.dataset.i)][input.dataset.efield] = input.value;
+    });
+  });
+  list.querySelectorAll('[data-edu-logo-i]').forEach(input => {
+    input.addEventListener('change', async () => {
+      const file = input.files[0]; if (!file) return;
+      const i = Number(input.dataset.eduLogoI);
+      const status = list.querySelector(`.edu-logo-status-${i}`);
+      if (status) status.textContent = 'Uploading…';
+      try {
+        const url = await uploadAssetFile(file, 'logos');
+        working.education[i].logo = url;
+        renderEduList();
+      } catch (err) { if (status) status.textContent = 'Failed: ' + (err && err.message ? err.message : err); }
     });
   });
   list.querySelectorAll('.remove-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      working.education.splice(Number(btn.dataset.i), 1);
-      renderEduList();
-    });
+    btn.addEventListener('click', () => { working.education.splice(Number(btn.dataset.i), 1); renderEduList(); });
   });
 }
 
@@ -474,21 +518,37 @@ function renderExpList() {
           <div class="field"><label>Years</label><input data-xfield="years" data-i="${i}" value="${esc(x.years)}" placeholder="e.g. 2022–2023"></div>
         </div>
         <div class="field"><label>Details (optional)</label><input data-xfield="details" data-i="${i}" value="${esc(x.details)}" placeholder="A short note about this"></div>
+        <div class="field">
+          <label>Organization logo (optional)</label>
+          ${x.logo ? `<img src="${esc(x.logo)}" style="height:32px; width:auto; display:block; margin-bottom:8px; object-fit:contain;">` : ''}
+          <label class="btn-soft" for="exp-logo-${i}" style="cursor:pointer; font-size:12.5px; padding:8px 16px; display:inline-flex;">${x.logo ? 'Replace logo' : '+ Upload logo'}</label>
+          <input type="file" id="exp-logo-${i}" data-exp-logo-i="${i}" accept="image/*" style="display:none;">
+          <span class="exp-logo-status-${i} note" style="margin-left:8px;"></span>
+        </div>
       </div>
     `);
     list.appendChild(item);
   });
   list.querySelectorAll('[data-xfield]').forEach(input => {
     input.addEventListener('input', () => {
-      const i = Number(input.dataset.i);
-      working.experience[i][input.dataset.xfield] = input.value;
+      working.experience[Number(input.dataset.i)][input.dataset.xfield] = input.value;
+    });
+  });
+  list.querySelectorAll('[data-exp-logo-i]').forEach(input => {
+    input.addEventListener('change', async () => {
+      const file = input.files[0]; if (!file) return;
+      const i = Number(input.dataset.expLogoI);
+      const status = list.querySelector(`.exp-logo-status-${i}`);
+      if (status) status.textContent = 'Uploading…';
+      try {
+        const url = await uploadAssetFile(file, 'logos');
+        working.experience[i].logo = url;
+        renderExpList();
+      } catch (err) { if (status) status.textContent = 'Failed: ' + (err && err.message ? err.message : err); }
     });
   });
   list.querySelectorAll('.remove-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      working.experience.splice(Number(btn.dataset.i), 1);
-      renderExpList();
-    });
+    btn.addEventListener('click', () => { working.experience.splice(Number(btn.dataset.i), 1); renderExpList(); });
   });
 }
 
@@ -645,35 +705,50 @@ function renderProjectList() {
         <div class="field"><label>Short summary (always visible)</label><input data-pfield="summary" data-i="${i}" value="${esc(p.summary)}" placeholder="One sentence shown on the card"></div>
         <div class="field"><label>Full details (shown on hover)</label><textarea data-pfield="details" data-i="${i}" placeholder="A longer paragraph about this project">${esc(p.details)}</textarea></div>
         <div class="field">
-          <label>File (optional — PDF, image, etc.)</label>
-          ${p.file ? `<a href="${esc(p.file)}" target="_blank" rel="noopener" style="display:block;font-size:13px;color:var(--accent);font-weight:600;word-break:break-all;margin-bottom:8px;">${esc(p.file)}</a>` : ''}
-          <div class="dropzone" id="proj-dz-${i}">
-            <div class="dz-title">${p.file ? 'Drop to replace, or click to browse' : 'Drag a file here, or click to browse'}</div>
-            <div class="dz-sub">PDF or image</div>
-            <input type="file" id="proj-file-${i}" data-proj-file-i="${i}" accept=".pdf,image/*,.doc,.docx">
-          </div>
-          <div id="proj-file-status-${i}" class="note" style="margin-top:6px;"></div>
+          <label>Link (optional) — a URL visitors can click to read more</label>
+          <input data-pfield="link" data-i="${i}" value="${esc(p.link)}" placeholder="https://...">
+        </div>
+        <div class="field">
+          <label>File (optional) — a PDF or document</label>
+          ${p.file
+            ? `<a href="${esc(p.file)}" target="_blank" rel="noopener" style="display:block; font-size:13px; color:var(--accent); font-weight:600; word-break:break-all; margin-bottom:8px;">${esc(p.file)}</a>`
+            : ''}
+          <label class="btn-soft" for="proj-file-${i}" style="cursor:pointer; font-size:12.5px; padding:8px 16px; display:inline-flex;">
+            ${p.file ? 'Replace file' : '+ Upload a file'}
+          </label>
+          <input type="file" id="proj-file-${i}" data-proj-upload-i="${i}" accept=".pdf,image/*,.doc,.docx" style="display:none;">
+          <span class="proj-upload-status-${i} note" style="margin-left:8px;"></span>
         </div>
       </div>
     `);
     list.appendChild(item);
   });
+
   list.querySelectorAll('[data-pfield]').forEach(input => {
     input.addEventListener('input', () => {
-      working.projects[Number(input.dataset.i)][input.dataset.pfield] = input.value;
+      const i = Number(input.dataset.i);
+      working.projects[i][input.dataset.pfield] = input.value;
     });
   });
-  (working.projects || []).forEach((_, i) => {
-    setupDropzone(`proj-dz-${i}`, `proj-file-${i}`, async (file) => {
-      const status = document.getElementById(`proj-file-status-${i}`);
+
+  // File upload per project
+  list.querySelectorAll('[data-proj-upload-i]').forEach(input => {
+    input.addEventListener('change', async () => {
+      const file = input.files[0];
+      if (!file) return;
+      const i = Number(input.dataset.projUploadI);
+      const status = list.querySelector(`.proj-upload-status-${i}`);
       if (status) status.textContent = 'Uploading…';
       try {
         const url = await uploadAssetFile(file, 'projects');
         working.projects[i].file = url;
         renderProjectList();
-      } catch (err) { if (status) status.textContent = 'Failed: ' + (err && err.message ? err.message : err); }
+      } catch (err) {
+        if (status) status.textContent = 'Upload failed: ' + (err && err.message ? err.message : String(err));
+      }
     });
   });
+
   list.querySelectorAll('.remove-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       working.projects.splice(Number(btn.dataset.i), 1);

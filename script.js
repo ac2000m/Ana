@@ -172,6 +172,9 @@ async function render() {
   });
 
   safe('contact', () => {
+    document.getElementById('contact-word-1').textContent = c.contactWord1 || "Let's";
+    document.getElementById('contact-word-2').textContent = c.contactWord2 || 'connect.';
+    document.getElementById('contact-sub').textContent = c.contactSub || 'Open to clinical opportunities, research, and conversation.';
     document.getElementById('contact-email').innerHTML = c.email ? `<a href="mailto:${c.email}">${c.email}</a>` : '';
     document.getElementById('contact-phone').textContent = c.phone || '';
     document.getElementById('contact-location').textContent = c.location || '';
