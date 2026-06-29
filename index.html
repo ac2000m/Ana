@@ -7,7 +7,7 @@
 <meta name="description" content="Ana Chandlee — Doctor of Physical Therapy Candidate, Chicago.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Caveat:wght@700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Playfair+Display:wght@700&family=Caveat:wght@700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -21,7 +21,7 @@
     <a href="#top" class="nav-logo" id="nav-name">AC</a>
     <div class="nav-links">
       <a href="#about">About</a>
-      <a href="#experience">Experience</a>
+      <a href="#experience">Education</a>
       <a href="#work">Work</a>
       <a href="#contact" class="nav-cta">Say hello</a>
       <a href="#" id="resume-link" class="nav-resume" target="_blank" rel="noopener">Résumé ↗</a>
@@ -32,7 +32,7 @@
   </div>
   <div class="nav-mobile" id="nav-mobile">
     <a href="#about">About</a>
-    <a href="#experience">Experience</a>
+    <a href="#experience">Education</a>
     <a href="#work">Work</a>
     <a href="#contact">Say hello</a>
     <a href="#" id="mobile-resume-link" target="_blank" rel="noopener">Résumé</a>
@@ -78,18 +78,18 @@
   </div>
 </section>
 
-<!-- EXPERIENCE -->
+<!-- EDUCATION -->
 <section class="exp-section reveal" id="experience">
   <div class="container">
     <div class="exp-top">
-      <span class="eyebrow">Experience</span>
-      <h2 class="section-title">Where I've been</h2>
+      <span class="eyebrow">Education</span>
+      <h2 class="section-title">Where I've studied</h2>
     </div>
     <ol class="exp-list" id="zigzag-rail"></ol>
   </div>
 </section>
 
-<!-- CREDENTIALS + PROJECTS -->
+<!-- CREDENTIALS + PROJECTS + EXPERIENCE + AWARDS -->
 <section class="work-section reveal" id="work">
   <div class="container">
 
@@ -105,10 +105,21 @@
 
     <div class="work-row">
       <div class="work-label">
-        <span class="eyebrow">Projects</span>
-        <h2 class="section-title">Research &amp; work</h2>
+        <span class="eyebrow">Research &amp; Work</span>
+        <h2 class="section-title">Research &amp; experience</h2>
       </div>
-      <div class="project-grid" id="project-grid"></div>
+      <div id="work-combined-grid"></div>
+    </div>
+
+    <div class="awards-row" id="awards-row" style="display:none;">
+      <hr class="work-rule">
+      <div class="work-row">
+        <div class="work-label">
+          <span class="eyebrow">Awards</span>
+          <h2 class="section-title">Honors &amp; awards</h2>
+        </div>
+        <div class="awards-grid" id="awards-grid"></div>
+      </div>
     </div>
 
   </div>

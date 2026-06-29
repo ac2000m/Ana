@@ -91,12 +91,17 @@ const SITE_CONTENT = {
   // ---------- EXPERIENCE ----------
   // Add jobs, internships, clinical hours, volunteer work, etc.
   // Add or remove entries the same way as Education above.
-  experience: [
+  experience: [],
+
+  // experience_items appear in the "Research & work" section alongside projects
+  // Add jobs, clinical hours, volunteer work here
+  experience_items: [
     {
-      title: "Physical Therapy Aide",
-      organization: "Dubuque Physical Therapy — Dubuque, Iowa",
-      years: "", // add dates if you'd like them shown
-      details: "Assisted physical therapists with patient care, exercises, and clinic operations."
+      name: "Physical Therapy Aide",
+      tag: "Work experience",
+      summary: "Dubuque Physical Therapy — Dubuque, Iowa",
+      details: "Assisted physical therapists with patient care, exercises, and clinic operations.",
+      logo: ""
     }
   ],
 
@@ -160,6 +165,14 @@ const SITE_CONTENT = {
     //   summary: "Looked at recovery timelines for student athletes.",
     //   details: "A longer paragraph explaining the research question, methods, and what you found or learned."
     // }
+  ],
+
+  // ---------- AWARDS ----------
+  // Add awards, honors, scholarships. Leave empty to hide this section.
+  // Best managed from the admin page.
+  awards: [
+    // Example:
+    // { name: "Dean's List", issuer: "Loras College", date: "Spring 2024", file: "" }
   ],
 
   // ---------- SOCIAL LINKS ----------

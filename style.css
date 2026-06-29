@@ -188,21 +188,30 @@ nav.scrolled {
    ============================================================ */
 .stat-strip {
   background: var(--rose);
-  padding: 40px var(--pad);
+  padding: 20px 32px;
 }
 .stat-strip-inner {
-  max-width: var(--max); margin: 0 auto;
-  display: flex; justify-content: center; gap: clamp(40px, 8vw, 120px);
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(var(--stat-count, 3), 1fr);
+  gap: 12px;
+  max-width: 720px;
+  margin: 0 auto;
 }
-.stat-item { text-align: center; }
+.stat-item {
+  text-align: center;
+  padding: 14px 16px;
+  border-right: 1px solid rgba(255,255,255,0.2);
+}
+.stat-item:last-child { border-right: none; }
 .stat-num {
-  font-family: var(--serif); font-size: clamp(44px, 6vw, 72px);
-  font-weight: 600; color: var(--white); line-height: 1.1; display: block;
-  margin-bottom: 6px;
+  font-family: "Playfair Display", Georgia, serif; font-size: clamp(44px, 6vw, 72px);
+  font-weight: 700; color: var(--white); line-height: 1; display: block;
+  margin-bottom: 8px;
 }
 .stat-label {
   font-size: 11px; font-weight: 600; letter-spacing: 0.14em;
-  text-transform: uppercase; color: rgba(255,255,255,0.6);
+  text-transform: uppercase; color: rgba(255,255,255,0.8);
   display: block;
 }
 
@@ -283,6 +292,7 @@ nav.scrolled {
 .work-rule { border: none; border-top: 1px solid var(--rule); }
 
 .cert-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; }
+.awards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; }
 .cert-card {
   background: var(--white); border: 1px solid var(--rule);
   border-radius: 14px; padding: 22px;
@@ -306,7 +316,7 @@ nav.scrolled {
 .project-summary { font-size: 14px; color: var(--ink-3); line-height: 1.6; }
 .project-details { font-size: 14px; color: var(--ink-3); line-height: 1.6; max-height: 0; opacity: 0; overflow: hidden; transition: max-height 0.35s, opacity 0.3s, margin-top 0.3s; }
 .project-card:hover .project-details { max-height: 260px; opacity: 1; margin-top: 12px; }
-.project-card:hover .project-summary { display: none; }
+
 .project-links { display: flex; gap: 14px; margin-top: 14px; flex-wrap: wrap; border-top: 1px solid var(--rule); padding-top: 12px; }
 .project-link { font-size: 13px; font-weight: 600; color: var(--rose); }
 .project-link:hover { text-decoration: underline; }
