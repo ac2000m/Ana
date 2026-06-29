@@ -282,7 +282,6 @@ nav.scrolled {
 .exp-org { font-size: 14px; color: var(--ink-3); margin-bottom: 10px; }
 .exp-detail { font-size: 14px; color: var(--ink-3); line-height: 1.65; max-width: 60ch; }
 @media (max-width: 600px) { .exp-item { grid-template-columns: 1fr; gap: 8px; } .exp-left { flex-direction: row; align-items: center; gap: 16px; } .exp-logo { max-height: 28px; width: auto; } }
-
 /* ============================================================
    WORK (credentials + projects)
    ============================================================ */
@@ -451,6 +450,34 @@ footer { background: var(--ink); border-top: 1px solid rgba(255,255,255,0.06); p
 
   /* Contact */
   .contact-section { padding: 80px 20px; }
+
+  /* Footer — stack vertically on mobile */
+  .footer-inner {
+    flex-direction: column;
+    gap: 16px;
+    text-align: center;
+  }
+  .footer-inner .social-links {
+    position: static;
+    transform: none;
+  }
+
+  /* Education — clean stacked layout on mobile */
+  .exp-item {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    padding: 24px 0;
+  }
+  .exp-left {
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+  }
+  .exp-logo { max-height: 28px; width: auto; }
+  .exp-year { font-size: 12px; }
+  .exp-title { font-size: 16px; }
+  .exp-org { font-size: 13px; margin-bottom: 6px; }
+  .exp-detail { font-size: 13px; }
 
   /* Mobile tap-to-expand: show details by default hidden, toggle on tap */
   .project-card { cursor: pointer; }
