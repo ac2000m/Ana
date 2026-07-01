@@ -100,10 +100,10 @@ nav.scrolled {
    HERO — full viewport, centered
    ============================================================ */
 .hero {
-  min-height: 100svh;
+  min-height: 90svh;
   display: flex; flex-direction: column; align-items: center;
   justify-content: center; text-align: center;
-  padding: 120px var(--pad) 80px;
+  padding: 90px var(--pad) 50px;
   position: relative;
 }
 .hero::before {
@@ -117,14 +117,14 @@ nav.scrolled {
 .hero-eyebrow {
   font-size: 12px; font-weight: 600; letter-spacing: 0.18em;
   text-transform: uppercase; color: var(--rose);
-  margin-bottom: 40px;
+  margin-bottom: 26px;
 }
 
 /* Arch-shaped photo — the centrepiece */
-.hero-photo-wrap { margin-bottom: 40px; }
+.hero-photo-wrap { margin-bottom: 28px; }
 .hero-photo-carousel { position: relative; display: inline-block; }
 .hero-photo {
-  width: clamp(200px, 30vw, 320px);
+  width: clamp(180px, 22vw, 260px);
   aspect-ratio: 3/4;
   border-radius: 18px;
   overflow: hidden;
@@ -156,15 +156,15 @@ nav.scrolled {
 /* Name */
 .hero-name {
   font-family: var(--script);
-  font-size: clamp(56px, 12vw, 130px);
+  font-size: clamp(48px, 9vw, 100px);
   font-weight: 700; line-height: 1;
   color: var(--ink);
-  margin-bottom: 18px;
+  margin-bottom: 14px;
 }
 
 .hero-sub {
   font-size: 17px; color: var(--ink-3); font-weight: 300;
-  max-width: 44ch; margin: 0 auto 36px; line-height: 1.7;
+  max-width: 44ch; margin: 0 auto 28px; line-height: 1.7;
 }
 .hero-actions { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
 
@@ -409,7 +409,7 @@ footer { background: var(--ink); border-top: 1px solid rgba(255,255,255,0.06); p
   /* Fix horizontal overflow */
   html, body { overflow-x: hidden; max-width: 100vw; }
 
-  /* Stats strip — wrap to 2 columns on mobile */
+  /* Stats strip — wrap to 2 columns on mobile, dynamic based on stat count */
   .stat-strip { padding: 20px 16px; }
   .stat-strip-inner {
     grid-template-columns: 1fr 1fr;
@@ -421,8 +421,11 @@ footer { background: var(--ink); border-top: 1px solid rgba(255,255,255,0.06); p
     border-bottom: 1px solid rgba(255,255,255,0.2);
   }
   .stat-item:nth-child(even) { border-right: none; }
-  .stat-item:nth-last-child(-n+2):not(:nth-child(even)) { border-bottom: none; }
-  .stat-item:last-child { border-bottom: none; }
+  .stat-item:last-child { border-right: none; border-bottom: none; }
+  /* Remove bottom border from the whole last row when the last item completes a pair */
+  .stat-item:nth-last-child(2):has(+ .stat-item:last-child:nth-child(even)) { border-bottom: none; }
+  /* If the total count is odd, the final stat spans the full width instead of sitting on the left */
+  .stat-item:nth-child(odd):nth-last-child(1) { grid-column: 1 / -1; }
   .stat-num { font-size: clamp(36px, 10vw, 52px); }
   .stat-label { font-size: 10px; }
 
@@ -496,7 +499,7 @@ footer { background: var(--ink); border-top: 1px solid rgba(255,255,255,0.06); p
     text-transform: uppercase;
     margin-top: 10px;
   }
-  .project-card.expanded .project-more { display: none; }
+  .project-card.expanded .project-more { display: inline-block; }
 }
 
 /* Desktop hover — only on devices that support hover */

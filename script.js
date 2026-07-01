@@ -141,8 +141,16 @@ async function render() {
           </div>
         `);
         // Tap-to-expand on touch devices
+        const moreBtn = card.querySelector('.project-more');
+        if (moreBtn) {
+          moreBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const expanded = card.classList.toggle('expanded');
+            moreBtn.textContent = expanded ? 'Less ↑' : 'More ↓';
+          });
+        }
         card.addEventListener('click', () => {
-          if (window.matchMedia('(hover: none)').matches) {
+          if (window.matchMedia('(hover: none)').matches && !moreBtn) {
             card.classList.toggle('expanded');
           }
         });
