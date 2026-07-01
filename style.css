@@ -282,7 +282,6 @@ nav.scrolled {
 .exp-org { font-size: 14px; color: var(--ink-3); margin-bottom: 10px; }
 .exp-detail { font-size: 14px; color: var(--ink-3); line-height: 1.65; max-width: 60ch; }
 @media (max-width: 600px) { .exp-item { grid-template-columns: 1fr; gap: 8px; } .exp-left { flex-direction: row; align-items: center; gap: 16px; } .exp-logo { max-height: 28px; width: auto; } }
-
 /* ============================================================
    WORK (credentials + projects)
    ============================================================ */
@@ -315,12 +314,11 @@ nav.scrolled {
 .project-tag { font-size: 11px; color: var(--rose); font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 10px; }
 .project-summary { font-size: 14px; color: var(--ink-3); line-height: 1.6; }
 .project-details { font-size: 14px; color: var(--ink-3); line-height: 1.6; max-height: 0; opacity: 0; overflow: hidden; transition: max-height 0.35s, opacity 0.3s, margin-top 0.3s; }
-.project-card:hover .project-details { max-height: 260px; opacity: 1; margin-top: 12px; }
 
 .project-links { display: flex; gap: 14px; margin-top: 14px; flex-wrap: wrap; border-top: 1px solid var(--rule); padding-top: 12px; }
 .project-link { font-size: 13px; font-weight: 600; color: var(--rose); }
 .project-link:hover { text-decoration: underline; }
-@media (hover: none) { .project-details { max-height: none; opacity: 1; margin-top: 12px; } }
+/* tap-to-expand handled in mobile media query below */
 
 /* ============================================================
    SKILLS
@@ -403,3 +401,106 @@ footer { background: var(--ink); border-top: 1px solid rgba(255,255,255,0.06); p
 }
 .social-links a:hover { border-color: var(--rose-mid); color: var(--white); background: var(--rose); }
 .social-links svg { width: 16px; height: 16px; fill: currentColor; }
+
+/* ============================================================
+   MOBILE RESPONSIVE
+   ============================================================ */
+@media (max-width: 600px) {
+  /* Fix horizontal overflow */
+  html, body { overflow-x: hidden; max-width: 100vw; }
+
+  /* Stats strip — wrap to 2 columns on mobile */
+  .stat-strip { padding: 20px 16px; }
+  .stat-strip-inner {
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+  }
+  .stat-item {
+    padding: 14px 8px;
+    border-right: 1px solid rgba(255,255,255,0.2);
+    border-bottom: 1px solid rgba(255,255,255,0.2);
+  }
+  .stat-item:nth-child(even) { border-right: none; }
+  .stat-item:nth-last-child(-n+2):not(:nth-child(even)) { border-bottom: none; }
+  .stat-item:last-child { border-bottom: none; }
+  .stat-num { font-size: clamp(36px, 10vw, 52px); }
+  .stat-label { font-size: 10px; }
+
+  /* Hero */
+  .hero { padding: 80px 20px 40px; }
+  .hero-name { font-size: clamp(36px, 11vw, 56px); }
+  .hero-sub { font-size: 15px; }
+  .hero-actions { flex-direction: column; align-items: stretch; gap: 10px; }
+  .cta-primary, .cta-ghost { text-align: center; justify-content: center; }
+
+  /* About */
+  .about-section { padding: 48px 20px; }
+  .about-quote { font-size: clamp(17px, 4.5vw, 22px); }
+
+  /* Education / experience timeline */
+  .exp-section { padding: 48px 20px; }
+  .exp-item { padding: 20px 0; gap: 12px; }
+
+  /* Work section */
+  .work-section { padding: 48px 20px; }
+  .project-grid { grid-template-columns: 1fr; }
+
+  /* Skills */
+  .skills-section { padding: 48px 20px; }
+
+  /* Contact */
+  .contact-section { padding: 80px 20px; }
+
+  /* Footer — stack vertically on mobile */
+  .footer-inner {
+    flex-direction: column;
+    gap: 16px;
+    text-align: center;
+  }
+  .footer-inner .social-links {
+    position: static;
+    transform: none;
+  }
+
+  /* Education — clean stacked layout on mobile */
+  .exp-item {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    padding: 24px 0;
+  }
+  .exp-left {
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+  }
+  .exp-logo { max-height: 28px; width: auto; }
+  .exp-year { font-size: 12px; }
+  .exp-title { font-size: 16px; }
+  .exp-org { font-size: 13px; margin-bottom: 6px; }
+  .exp-detail { font-size: 13px; }
+
+  /* Mobile tap-to-expand: show details by default hidden, toggle on tap */
+  .project-card { cursor: pointer; }
+  .project-card .project-details {
+    max-height: 0; opacity: 0; margin-top: 0;
+  }
+  .project-card.expanded .project-details {
+    max-height: 400px; opacity: 1; margin-top: 12px;
+  }
+  .project-more {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--rose);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-top: 10px;
+  }
+  .project-card.expanded .project-more { display: none; }
+}
+
+/* Desktop hover — only on devices that support hover */
+@media (hover: hover) {
+  .project-more { display: none; }
+  .project-card:hover .project-details { max-height: 260px; opacity: 1; margin-top: 12px; }
+}

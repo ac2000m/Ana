@@ -126,19 +126,27 @@ async function render() {
     if (allItems.length) {
       const pg = el('<div class="project-grid"></div>');
       allItems.forEach(p => {
-        pg.appendChild(el(`
+        const card = el(`
           <div class="project-card">
             ${p.logo ? `<img src="${p.logo}" style="height:32px;width:auto;object-fit:contain;margin-bottom:8px;" loading="lazy">` : ''}
             <div class="project-name">${p.name || ''}</div>
             ${p.tag ? `<div class="project-tag">${p.tag}</div>` : ''}
             <p class="project-summary">${p.summary || ''}</p>
             <p class="project-details">${p.details || ''}</p>
+            ${p.details ? `<span class="project-more">More ↓</span>` : ''}
             ${p.link || p.file ? `<div class="project-links">
               ${p.link ? `<a class="project-link" href="${p.link}" target="_blank" rel="noopener">View project →</a>` : ''}
               ${p.file ? `<a class="project-link" href="${p.file}" target="_blank" rel="noopener">Download file →</a>` : ''}
             </div>` : ''}
           </div>
-        `));
+        `);
+        // Tap-to-expand on touch devices
+        card.addEventListener('click', () => {
+          if (window.matchMedia('(hover: none)').matches) {
+            card.classList.toggle('expanded');
+          }
+        });
+        pg.appendChild(card);
       });
       grid.appendChild(pg);
     } else {
