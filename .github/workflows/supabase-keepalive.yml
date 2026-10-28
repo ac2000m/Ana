@@ -1,0 +1,28 @@
+name: Keep Supabase awake
+
+# Supabase pauses free-tier projects after ~7 days without activity,
+# which breaks the photos and content. This pings the database every 3 days.
+
+on:
+  schedule:
+    - cron: "0 12 */3 * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Query site_content
+        run: |
+          # Reuse the public URL and anon key already in supabase-config.js
+          URL=$(sed -n 's/.*SUPABASE_URL = "\(.*\)".*/\1/p' supabase-config.js)
+          KEY=$(sed -n 's/.*SUPABASE_ANON_KEY = "\(.*\)".*/\1/p' supabase-config.js)
+          curl -sf "$URL/rest/v1/site_content?select=id&id=eq.ana-site" \
+            -H "apikey: $KEY" \
+            -H "Authorization: Bearer $KEY"
